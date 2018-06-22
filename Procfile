@@ -1,0 +1,1 @@
+web: gunicorn conttudoweb.wsgi --log-file -
