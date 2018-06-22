@@ -8,7 +8,7 @@
 ## How to develop?
 
 1. Clone the repository;
-2. Create a virtualenv with Python 3.5;
+2. Create a virtualenv with Python 3.6;
 3. Activate virtualenv;
 4. Install the dependencies;
 5. Configure the instance with .env;
