@@ -123,8 +123,8 @@ class Account(models.Model):
     due_date = models.DateField('data de vencimento')
     type = models.CharField('tipo', max_length=3, default=AccountTypes.normal.value,
                             help_text="<a href='#' title='"
-                                      "Contas normais vencem apenas uma vez. "
-                                      "Contas recorrentes vencem uma vez por período indefinidamente. "
+                                      "Contas normais vencem apenas uma vez. \n"
+                                      "Contas recorrentes vencem uma vez por período indefinidamente. \n"
                                       "Contas parceladas têm um número fixo de vencimentos pré-estipulado.'>?</a>",
                             choices=[
                                 (AccountTypes.normal.value, 'Normal'),
