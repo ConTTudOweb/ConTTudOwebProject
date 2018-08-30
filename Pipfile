@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+dj-database-url = "*"
+dj-static = "*"
+django-debug-toolbar = "*"
+django-extensions = "*"
+django-test-without-migrations = "*"
+python-decouple = "*"
+pytz = "*"
+six = "*"
+sqlparse = "*"
+"static3" = "*"
+Django = "*"
+"psycopg2" = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
