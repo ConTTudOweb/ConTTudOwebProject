@@ -16,6 +16,7 @@ sqlparse = "*"
 "static3" = "*"
 Django = "*"
 "psycopg2" = "*"
+gunicorn = "*"
 
 [dev-packages]
 
