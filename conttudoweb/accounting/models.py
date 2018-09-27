@@ -3,6 +3,8 @@ import enum
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from conttudoweb.accounting.utils import get_due_date, AccountFrequencys
+
 
 class Category(models.Model):
     description = models.CharField('descrição', max_length=255)
@@ -107,14 +109,14 @@ class Account(models.Model):
         recurrent = 'rec'
         parcelled = 'par'
 
-    class AccountFrequencys(enum.Enum):
-        weekly = 'weekly'
-        biweekly = 'biweekly'
-        monthly = 'monthly'
-        bimonthly = 'bimonthly'
-        quarterly = 'quarterly'
-        semiannual = 'semiannual'
-        annual = 'annual'
+    # class AccountFrequencys(enum.Enum):
+    #     weekly = 'weekly'
+    #     biweekly = 'biweekly'
+    #     monthly = 'monthly'
+    #     bimonthly = 'bimonthly'
+    #     quarterly = 'quarterly'
+    #     semiannual = 'semiannual'
+    #     annual = 'annual'
 
     entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
@@ -144,23 +146,28 @@ class Account(models.Model):
                                  ])
     number_of_parcels = models.PositiveIntegerField('número de parcelas', null=True, blank=True,
                                                     help_text="Obrigatório caso o tipo seja 'Parcelada'.", )
+    parcel = models.PositiveIntegerField(null=True, blank=True, editable=False)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, blank=True,
                                  verbose_name=Category._meta.verbose_name)
     document_emission_date = models.DateField('data de emissão', null=True, blank=True)
     expected_deposit_account = models.ForeignKey('DepositAccount', on_delete=models.CASCADE, null=True, blank=True)
     observation = models.TextField('observação', null=True, blank=True)
+    parent = models.IntegerField(null=True, blank=True, editable=False)
 
     def __str__(self):
-        return self.description
+        if self.type == self.AccountTypes.parcelled.value:
+            return "{} - {}/{}".format(self.description, str(self.parcel), str(self.number_of_parcels))
+        else:
+            return self.description
 
     def clean(self):
         # Quanto o tipo for "Recorrente" deve obrigar a preencher a frequência.
-        if self.type == self.AccountTypes.recurrent.value and self.frequency is None:
+        if self.type != self.AccountTypes.normal.value and self.frequency is None:
             raise ValidationError({'frequency': [
-                'A "Frequência" deve ser preenchida quando o "Tipo" for "Recorrente"!',
+                'A "Frequência" deve ser preenchida quando o "Tipo" for diferente de "Normal"!',
             ]})
-        # Quando o tipo não é "Recorrente" a frequência não deve estar preenchida.
-        if self.type != self.AccountTypes.recurrent.value and self.frequency is not None:
+        # Quando o tipo é "Normal" a frequência não deve estar preenchida.
+        if self.type == self.AccountTypes.normal.value and self.frequency is not None:
             self.frequency = None
 
         # Quanto o tipo for "Parcelada" deve obrigar a preencher o número de parcelas.
@@ -171,6 +178,52 @@ class Account(models.Model):
         # Quando o tipo não é "Parcelada" o número de parcelas não deve estar preenchido.
         if self.type != self.AccountTypes.parcelled.value and self.number_of_parcels is not None:
             self.number_of_parcels = None
+        # Quando o tipo é "Normal" o parent não deve estar preenchido.
+        if self.type == self.AccountTypes.normal.value and self.parent is not None:
+            self.parent = None
+
+    def save(self, *args, **kwargs):
+        super(Account, self).save(*args, **kwargs)
+
+        if self.type == self.AccountTypes.parcelled.value and self.parent is None:
+            self.parent = self.pk
+            self.parcel = 1
+            self.save()
+
+            x = self.parcel + 1
+            while x <= self.number_of_parcels:
+                from copy import deepcopy
+                new_instance = deepcopy(self)
+                new_instance.id = None
+                new_instance.parcel = x
+                new_instance.due_date = get_due_date(self.due_date, self.frequency, x)
+                new_instance.save()
+                x += 1
+
+        if self.type == self.AccountTypes.recurrent.value:
+            if self.parent is None:
+
+                from django.utils.timezone import now
+                print("inicio: " + str(now().strftime("%Y-%m-%d %H:%M:%S")))
+
+                self.parent = self.pk
+                self.save()
+
+                x = 2
+                from dateutil.relativedelta import relativedelta
+                date_max = self.due_date + relativedelta(years=5)
+                while True:
+                    due_date = get_due_date(self.due_date, self.frequency, x)
+                    if due_date > date_max:
+                        break
+                    else:
+                        from copy import deepcopy
+                        new_instance = deepcopy(self)
+                        new_instance.id = None
+                        new_instance.due_date = due_date
+                        new_instance.save()
+                        x += 1
+                print("fim: " + str(now().strftime("%Y-%m-%d %H:%M:%S")))
 
     class Meta:
         abstract = True

@@ -8,8 +8,8 @@
 ## How to develop?
 
 1. Clone the repository;
-2. Create a virtualenv with Python 3.6;
-3. Activate virtualenv;
+2. Create a pipenv with Python 3;
+3. Activate pipenv;
 4. Install the dependencies;
 5. Configure the instance with .env;
 6. Run the tests;
@@ -17,9 +17,9 @@
 ```console
 git clone https://github.com/ConTTudOweb/ConTTudOwebProject.git
 cd ConTTudOwebProject
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
+pipenv --three
+pipenv shell
+pipenv install
 cp contrib/env-sample .env
 python manage.py test
 ```

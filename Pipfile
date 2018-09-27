@@ -17,6 +17,7 @@ sqlparse = "*"
 Django = "*"
 "psycopg2" = "*"
 gunicorn = "*"
+python-dateutil = "*"
 
 [dev-packages]
 

@@ -129,6 +129,8 @@ DATABASES = {
     'default': config('DATABASE_URL', default=default_dburl, cast=dburl),
 }
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=1000, cast=int)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

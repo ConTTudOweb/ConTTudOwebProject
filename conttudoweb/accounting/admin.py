@@ -7,6 +7,7 @@ from .models import AccountReceivables, AccountPayable, Bank, Category, Classifi
 class AccountModelForm(forms.ModelForm):
     class Media:
         js = ('js/account-type-field-admin.js',)
+        # TODO: Criar um teste para verificar se o código do JS acima está funcionando.
 
 
 class AccountPayableModelForm(AccountModelForm):
