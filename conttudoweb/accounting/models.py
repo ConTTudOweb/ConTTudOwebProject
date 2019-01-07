@@ -139,7 +139,7 @@ class Account(models.Model):
                                      (AccountFrequencys.weekly.value, 'Semanal'),
                                      (AccountFrequencys.biweekly.value, 'Quinzenal'),
                                      (AccountFrequencys.monthly.value, 'Mensal'),
-                                     (AccountFrequencys.bimonthly.value, 'Mensal'),
+                                     (AccountFrequencys.bimonthly.value, 'Bimestral'),
                                      (AccountFrequencys.quarterly.value, 'Trimestral'),
                                      (AccountFrequencys.semiannual.value, 'Semestral'),
                                      (AccountFrequencys.annual.value, 'Anual'),
