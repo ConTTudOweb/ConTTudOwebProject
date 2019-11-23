@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 
 from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount
 
@@ -25,7 +27,7 @@ class AccountReceivablesModelForm(AccountModelForm):
 
 
 class AccountModelAdmin:
-    list_display = ('description', 'due_date', 'amount', 'category', 'person')
+    list_display = ('description', 'due_date', 'amount', 'category', 'person', 'action')
     search_fields = ('description',)
     exclude = ('entity',)
     autocomplete_fields = ('category',)
@@ -48,15 +50,55 @@ class AccountModelAdmin:
     def get_queryset(self, request):
         return super().get_queryset(request).filter(entity=request.user.entity)
 
+    def action(self, obj):
+        text = None
+        url_reverse = None
+        _reconcile = "Conciliar"
+        _reconciled = "Conciliado"
+
+        if self.__class__ == AccountPayableModelAdmin:
+            if not obj.liquidated:
+                text = "Pagar"
+                url_reverse = "admin:accounting_accountpayable_change"
+            elif not obj.reconciled:
+                text = _reconcile
+                url_reverse = "admin:accounting_accountpayable_change"
+            elif obj.reconciled:
+                text = _reconciled
+                url_reverse = "admin:accounting_accountpayable_change"
+        elif self.__class__ == AccountReceivablesModelAdmin:
+            if not obj.liquidated:
+                text = "Receber"
+                url_reverse = "admin:accounting_accountreceivables_change"
+            elif not obj.reconciled:
+                text = _reconcile
+                url_reverse = "admin:accounting_accountreceivables_change"
+            elif obj.reconciled:
+                text = _reconciled
+                url_reverse = "admin:accounting_accountreceivables_change"
+
+        if text is not None:
+            return format_html(
+                '<a class="button" href="{}">'+text+'</a>',
+                reverse(url_reverse, args=[obj.pk]),
+            )
+        else:
+            return ""
+
+    action.short_description = ''
+    action.allow_tags = True
+
 
 @admin.register(AccountPayable)
 class AccountPayableModelAdmin(AccountModelAdmin, admin.ModelAdmin):
     form = AccountPayableModelForm
+    change_form_template = 'change_form_accountPayable.html'
 
 
 @admin.register(AccountReceivables)
 class AccountReceivablesModelAdmin(AccountModelAdmin, admin.ModelAdmin):
     form = AccountReceivablesModelForm
+    change_form_template = 'change_form_accountReceivables.html'
 
 
 @admin.register(Bank)

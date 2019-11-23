@@ -17,3 +17,9 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="{% static "admin/js/custom.js" %}"></script>
+{% endblock %}

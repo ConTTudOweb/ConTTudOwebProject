@@ -109,15 +109,6 @@ class Account(models.Model):
         recurrent = 'rec'
         parcelled = 'par'
 
-    # class AccountFrequencys(enum.Enum):
-    #     weekly = 'weekly'
-    #     biweekly = 'biweekly'
-    #     monthly = 'monthly'
-    #     bimonthly = 'bimonthly'
-    #     quarterly = 'quarterly'
-    #     semiannual = 'semiannual'
-    #     annual = 'annual'
-
     entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
@@ -153,6 +144,7 @@ class Account(models.Model):
     expected_deposit_account = models.ForeignKey('DepositAccount', on_delete=models.CASCADE, null=True, blank=True)
     observation = models.TextField('observação', null=True, blank=True)
     parent = models.IntegerField(null=True, blank=True, editable=False)
+    reconciled = models.BooleanField('conciliado', default=False)
 
     def __str__(self):
         if self.type == self.AccountTypes.parcelled.value:
@@ -234,6 +226,7 @@ class AccountPayable(Account):
                                verbose_name='fornecedor', limit_choices_to={'supplier': True})
     classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
                                               verbose_name='classificação', limit_choices_to={'cost_center': True})
+    liquidated = models.BooleanField('pago?', default=False)
 
     class Meta:
         verbose_name = 'conta à pagar'
@@ -245,6 +238,7 @@ class AccountReceivables(Account):
                                verbose_name='cliente', limit_choices_to={'customer': True})
     classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
                                               verbose_name='classificação', limit_choices_to={'revenue_center': True})
+    liquidated = models.BooleanField('recebido?', default=False)
 
     class Meta:
         verbose_name = 'conta à receber'
