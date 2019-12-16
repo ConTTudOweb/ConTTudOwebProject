@@ -8,7 +8,7 @@
 ## How to develop?
 
 1. Clone the repository;
-2. Create a pipenv with Python 3;
+2. Create a pipenv with Python 3.8.0;
 3. Activate pipenv;
 4. Install the dependencies;
 5. Configure the instance with .env;
