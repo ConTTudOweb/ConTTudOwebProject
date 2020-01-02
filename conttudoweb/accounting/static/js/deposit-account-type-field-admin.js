@@ -31,4 +31,4 @@
             toggleFields();
         });
     });
-})(django.jQuery);
+})(window.jQuery);

@@ -23,4 +23,4 @@
             toggleFrequencyAndNumberOfParcels();
         });
     });
-})(django.jQuery);
+})(window.jQuery);

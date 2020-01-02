@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount
+from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, Recurrence
 
 
 class AccountModelForm(forms.ModelForm):
@@ -27,21 +27,24 @@ class AccountReceivablesModelForm(AccountModelForm):
 
 
 class AccountModelAdmin:
-    list_display = ('description', 'due_date', 'amount', 'category', 'person', 'action')
+    list_display = ('__str__', 'due_date', 'amount', 'category', 'person', 'action')
     search_fields = ('description',)
     exclude = ('entity',)
     autocomplete_fields = ('category',)
     raw_id_fields = ('person',)  # TODO: autocomplete_fields não está funcionando com limit_choices_to
     fieldsets = (
         (None, {
-            'fields': (('type', 'frequency', 'number_of_parcels'),
-                       ('description', 'due_date', 'amount'),
-                       ('category', 'document_emission_date', 'expected_deposit_account'),
-                       ('person', 'classification_center', 'document'),
-                       'observation')
+            'fields': (
+                ('type', 'frequency', 'number_of_parcels'),
+                ('description', 'due_date', 'amount'),
+                ('category', 'document_emission_date', 'expected_deposit_account'),
+                ('person', 'classification_center', 'document'),
+                'observation'
+            )
         }),
     )
     radio_fields = {"type": admin.HORIZONTAL}
+    ordering = ['due_date']
 
     def save_model(self, request, obj, form, change):
         obj.entity = request.user.entity
@@ -79,7 +82,7 @@ class AccountModelAdmin:
 
         if text is not None:
             return format_html(
-                '<a class="button" href="{}">'+text+'</a>',
+                '<a class="button" href="{}">' + text + '</a>',
                 reverse(url_reverse, args=[obj.pk]),
             )
         else:
@@ -87,6 +90,11 @@ class AccountModelAdmin:
 
     action.short_description = ''
     action.allow_tags = True
+
+
+@admin.register(Recurrence)
+class RecurrenceModelAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(AccountPayable)

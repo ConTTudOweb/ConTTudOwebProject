@@ -1,9 +1,12 @@
 import enum
+from copy import deepcopy
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import now
 
-from conttudoweb.accounting.utils import get_due_date, AccountFrequencys
+from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence
 
 
 class Category(models.Model):
@@ -14,6 +17,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'categoria'
+        ordering = ['description']
 
 
 class Bank(models.Model):
@@ -103,6 +107,37 @@ class ClassificationCenter(models.Model):
         verbose_name_plural = 'centros de custo/receita'
 
 
+class Recurrence(models.Model):
+    # Está é a data final cuja a recorrência foi gerada
+    date = models.DateField(auto_now_add=True)
+    original_date_day = models.IntegerField(null=True)
+    entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if AccountPayable.objects.filter(recurrence_key=self).exists() or AccountReceivables.objects.filter(recurrence_key=self).exists():
+            if AccountPayable.objects.filter(recurrence_key=self).exists():
+                last = AccountPayable.objects.filter(recurrence_key=self).order_by('-recurrence_count').first()
+            else:
+                last = AccountReceivables.objects.filter(recurrence_key=self).order_by('-recurrence_count').first()
+
+            if self.date > last.due_date:
+                due_date = last.due_date
+                recurrence_count = last.recurrence_count
+                while True:
+                    if due_date > self.date:
+                        break
+                    else:
+                        due_date = get_due_date(due_date, last.frequency, day=self.original_date_day)
+                        recurrence_count += recurrence_count
+                        new_instance = deepcopy(last)
+                        new_instance.id = None
+                        new_instance.recurrence_count = recurrence_count
+                        new_instance.due_date = due_date
+                        new_instance.save()
+
+
 class Account(models.Model):
     class AccountTypes(enum.Enum):
         normal = 'nor'
@@ -114,6 +149,8 @@ class Account(models.Model):
     description = models.CharField('descrição', max_length=255)
     amount = models.DecimalField('valor', max_digits=15, decimal_places=2)
     due_date = models.DateField('data de vencimento')
+    recurrence_key = models.ForeignKey('Recurrence', on_delete=models.PROTECT, null=True, blank=True, editable=False)
+    recurrence_count = models.IntegerField(null=True, blank=True, editable=False)
     type = models.CharField('tipo', max_length=3, default=AccountTypes.normal.value,
                             help_text="<a href='#' title='"
                                       "Contas normais vencem apenas uma vez. \n"
@@ -146,11 +183,17 @@ class Account(models.Model):
     parent = models.IntegerField(null=True, blank=True, editable=False)
     reconciled = models.BooleanField('conciliado', default=False)
 
+    __original_description = None
+
     def __str__(self):
         if self.type == self.AccountTypes.parcelled.value:
             return "{} - {}/{}".format(self.description, str(self.parcel), str(self.number_of_parcels))
         else:
             return self.description
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_description = self.description
 
     def clean(self):
         # Quanto o tipo for "Recorrente" deve obrigar a preencher a frequência.
@@ -175,8 +218,6 @@ class Account(models.Model):
             self.parent = None
 
     def save(self, *args, **kwargs):
-        super(Account, self).save(*args, **kwargs)
-
         if self.type == self.AccountTypes.parcelled.value and self.parent is None:
             self.parent = self.pk
             self.parcel = 1
@@ -188,34 +229,28 @@ class Account(models.Model):
                 new_instance = deepcopy(self)
                 new_instance.id = None
                 new_instance.parcel = x
-                new_instance.due_date = get_due_date(self.due_date, self.frequency, x)
+                new_instance.due_date = get_due_date(self.due_date, self.frequency, parcel=x)
                 new_instance.save()
                 x += 1
 
         if self.type == self.AccountTypes.recurrent.value:
-            if self.parent is None:
-
-                from django.utils.timezone import now
-                print("inicio: " + str(now().strftime("%Y-%m-%d %H:%M:%S")))
-
-                self.parent = self.pk
+            if self.recurrence_key is None:
+                recur = Recurrence.objects.create(entity=self.entity, original_date_day=self.due_date.day)
+                self.recurrence_key = recur
+                self.recurrence_count = 1
                 self.save()
+                self.recurrence_key.date = now().date() + relativedelta(years=years_in_future_for_recurrence)
+                self.recurrence_key.save()
+            else:
+                if self.description != self.__original_description:
+                    self._meta.model.objects.filter(recurrence_key=self.recurrence_key, recurrence_count__gt=self.recurrence_count, liquidated=False).update(description=self.description)
 
-                x = 2
-                from dateutil.relativedelta import relativedelta
-                date_max = self.due_date + relativedelta(years=5)
-                while True:
-                    due_date = get_due_date(self.due_date, self.frequency, x)
-                    if due_date > date_max:
-                        break
-                    else:
-                        from copy import deepcopy
-                        new_instance = deepcopy(self)
-                        new_instance.id = None
-                        new_instance.due_date = due_date
-                        new_instance.save()
-                        x += 1
-                print("fim: " + str(now().strftime("%Y-%m-%d %H:%M:%S")))
+                date_max = now().date() + relativedelta(years=years_in_future_for_recurrence)
+                if self.recurrence_key.date < date_max:
+                    self.recurrence_key.date = date_max
+                    self.recurrence_key.save()
+
+        super(Account, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True
