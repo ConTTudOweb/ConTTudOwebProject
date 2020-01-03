@@ -123,7 +123,7 @@ WSGI_APPLICATION = 'conttudoweb.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 # default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
-default_dburl = 'postgres://postgres:postgres@127.0.0.1:5432/travis_ci_test'
+default_dburl = 'postgres://postgres:postgres@127.0.0.1:5432/db_conttudoweb'
 DATABASES = {
     'default': config('DATABASE_URL', default=default_dburl, cast=dburl),
 }
