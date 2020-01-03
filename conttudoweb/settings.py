@@ -15,10 +15,8 @@ import os
 from decouple import config, Csv
 from dj_database_url import parse as dburl
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -37,8 +35,7 @@ INTERNAL_IPS = ['127.0.0.1', '0.0.0.0']
 
 ADMINS = [('Alessandro', 'alessandrolimafolk@gmail.com'), ]
 
-AUTH_USER_MODEL = 'authentication.User'
-
+AUTH_USER_MODEL = 'authentication.MyUser'
 
 # Email configuration
 
@@ -50,7 +47,6 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-
 # Application definition
 
 # customizations
@@ -58,37 +54,40 @@ ADMIN_SITE_TITLE = config('ADMIN_SITE_TITLE', default='ConTTudOweb')
 ADMIN_SITE_HEADER = config('ADMIN_SITE_HEADER', default='ConTTudO soluções web')
 ADMIN_INDEX_TITLE = config('ADMIN_INDEX_TITLE', default='Controles do ConTTudOweb App')
 
-# Django Apps
-APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-)
+PUBLIC_SCHEMA_NAME = 'public'
+
+TENANT_MODEL = "tenants.Client"
+
+SHARED_APPS = ["tenant_schemas", "conttudoweb.tenants"]
+
+TENANT_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    "test_without_migrations",
+    "django_extensions",
+    "debug_toolbar",
+
+    "conttudoweb.authentication",
+    "conttudoweb.core",
+    "conttudoweb.accounting",
+]
+
 if DEVELOPER:
-    APPS += (
+    TENANT_APPS += [
         'django.contrib.admindocs',
-    )
+    ]
 
-# Third Parts Apps
-APPS += (
-    'test_without_migrations',
-    'django_extensions',
-    'debug_toolbar',
-)
-
-# Project Apps
-APPS += (
-    'conttudoweb.core.apps.CoreConfig',
-    'conttudoweb.authentication.apps.AuthenticationConfig',
-    'conttudoweb.accounting.apps.AccountingConfig',
-)
-
-INSTALLED_APPS = APPS
+INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 MIDDLEWARE = [
+    'tenant_schemas.middleware.TenantMiddleware',
+    # 'tenant_schemas.middleware.DefaultTenantMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -120,7 +119,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'conttudoweb.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -128,9 +126,12 @@ default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
 DATABASES = {
     'default': config('DATABASE_URL', default=default_dburl, cast=dburl),
 }
+DATABASES['default']['ENGINE'] = 'tenant_schemas.postgresql_backend'
+DATABASE_ROUTERS = (
+    'tenant_schemas.routers.TenantSyncRouter',
+)
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=1000, cast=int)
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -150,7 +151,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -164,7 +164,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
@@ -175,3 +174,4 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'

@@ -4,11 +4,9 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from conttudoweb.core.models import Entity
-
 
 # https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
-class UserManager(BaseUserManager):
+class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None):
         """
         Creates and saves a User with the given email and password.
@@ -38,28 +36,28 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class MyUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name='endereço de e-mail',
         max_length=255,
         unique=True,
     )
     password = models.CharField('senha', max_length=128)
-    date_of_birth = models.DateField('data de nascimento', null=True, blank=True)
+    date_of_birth = models.DateField('data de nascimento', null=True)
     is_active = models.BooleanField('ativo?', default=True)
     is_staff = models.BooleanField('funcionário?', default=False)
 
     first_name = models.CharField('primeiro nome', max_length=30, blank=True)
     last_name = models.CharField('sobrenome', max_length=150, blank=True)
 
-    entity = models.ForeignKey('core.Entity', on_delete=models.SET_NULL, null=True,
-                               verbose_name=Entity._meta.verbose_name+' atual')
+    # entity = models.ForeignKey('core.Entity', on_delete=models.SET_NULL, null=True,
+    #                            verbose_name=Entity._meta.verbose_name+' atual')
 
     @property
     def username(self):
         return self.email
 
-    objects = UserManager()
+    objects = MyUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

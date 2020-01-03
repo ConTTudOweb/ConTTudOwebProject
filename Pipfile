@@ -18,6 +18,7 @@ Django = "*"
 "psycopg2" = "*"
 gunicorn = "*"
 python-dateutil = "*"
+django-tenant-schemas = "*"
 
 [dev-packages]
 

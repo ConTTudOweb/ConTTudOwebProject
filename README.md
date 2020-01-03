@@ -23,3 +23,12 @@ pipenv install
 cp contrib/env-sample .env
 python manage.py test
 ```
+
+```
+python manage.py migrate_schemas --shared
+
+python manage.py shell_plus
+Client.objects.create(name="sandrofolk", schema_name="sandrofolk", domain_url="sandrofolk.conttudoweb.local")
+
+python manage.py tenant_command createsuperuser --schema=sandrofolk
+```

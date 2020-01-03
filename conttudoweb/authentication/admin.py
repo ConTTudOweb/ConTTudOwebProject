@@ -2,14 +2,15 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import admin
 from django.contrib.auth.models import Permission
 
-from .forms import UserChangeForm, UserCreationForm
-from .models import User
+from .forms import MyUserChangeForm, MyUserCreationForm
+from .models import MyUser
 
 
-class UserAdmin(BaseUserAdmin):
+@admin.register(MyUser)
+class MyUserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
-    form = UserChangeForm
-    add_form = UserCreationForm
+    form = MyUserChangeForm
+    add_form = MyUserCreationForm
 
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
@@ -20,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'password')}),
         ('Dados pessoais', {'fields': ('date_of_birth', 'first_name', 'last_name')}),
         ('Permissões', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
-        ('Preferências', {'fields': ('entity',)}),
+        # ('Preferências', {'fields': ('entity',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
@@ -37,8 +38,5 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
-
-# Now register the new UserAdmin...
-admin.site.register(User, UserAdmin)
 
 admin.site.register(Permission)
