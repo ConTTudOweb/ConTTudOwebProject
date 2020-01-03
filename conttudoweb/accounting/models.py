@@ -38,7 +38,7 @@ class DepositAccount(models.Model):
         money = 'mon'
         investment = 'inv'
 
-    entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
+    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
 
     type = models.CharField('tipo', max_length=3, default=DepositAccountTypes.current_account.value, choices=[
         (DepositAccountTypes.current_account.value, 'Conta corrente'),
@@ -79,7 +79,7 @@ class DepositAccount(models.Model):
 
 
 class ClassificationCenter(models.Model):
-    entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
+    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     name = models.CharField('nome', max_length=30, unique=True)
     cost_center = models.BooleanField('centro de custo', default=False)
     revenue_center = models.BooleanField('centro de receita', default=False)
@@ -111,7 +111,7 @@ class Recurrence(models.Model):
     # Está é a data final cuja a recorrência foi gerada
     date = models.DateField(auto_now_add=True)
     original_date_day = models.IntegerField(null=True)
-    entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
+    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -144,7 +144,7 @@ class Account(models.Model):
         recurrent = 'rec'
         parcelled = 'par'
 
-    entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
+    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
     amount = models.DecimalField('valor', max_digits=15, decimal_places=2)
@@ -218,6 +218,8 @@ class Account(models.Model):
             self.parent = None
 
     def save(self, *args, **kwargs):
+        super(Account, self).save(*args, **kwargs)
+
         if self.type == self.AccountTypes.parcelled.value and self.parent is None:
             self.parent = self.pk
             self.parcel = 1
@@ -235,7 +237,8 @@ class Account(models.Model):
 
         if self.type == self.AccountTypes.recurrent.value:
             if self.recurrence_key is None:
-                recur = Recurrence.objects.create(entity=self.entity, original_date_day=self.due_date.day)
+                # recur = Recurrence.objects.create(entity=self.entity, original_date_day=self.due_date.day)
+                recur = Recurrence.objects.create(original_date_day=self.due_date.day)
                 self.recurrence_key = recur
                 self.recurrence_count = 1
                 self.save()
@@ -250,7 +253,7 @@ class Account(models.Model):
                     self.recurrence_key.date = date_max
                     self.recurrence_key.save()
 
-        super(Account, self).save(*args, **kwargs)
+        # super(Account, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True

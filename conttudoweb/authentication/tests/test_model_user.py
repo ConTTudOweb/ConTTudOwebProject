@@ -1,4 +1,5 @@
 from django.test import TestCase
+from tenant_schemas.test.cases import FastTenantTestCase
 
 from ..models import MyUser
 
@@ -14,7 +15,7 @@ def create_user():
     return user
 
 
-class UserModelTest(TestCase):
+class UserModelTest(FastTenantTestCase):
     def setUp(self):
         self.user = create_user()
 

@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.test import TestCase
+from tenant_schemas.test.cases import FastTenantTestCase
 
 from ..admin import BankModelAdmin
 from ...core.tests.test_model import ModelAdminTest
@@ -22,7 +23,7 @@ def create_bank():
     return bank
 
 
-class BankModelTest(TestCase):
+class BankModelTest(FastTenantTestCase):
     def setUp(self):
         self.bank = create_bank()
 

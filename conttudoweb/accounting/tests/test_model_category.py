@@ -1,11 +1,12 @@
 from django.test import TestCase
+from tenant_schemas.test.cases import FastTenantTestCase
 
 from ..admin import CategoryModelAdmin
 from ...core.tests.test_model import ModelAdminTest
 from ...accounting.models import Category
 
 
-class CategoryModelTest(TestCase):
+class CategoryModelTest(FastTenantTestCase):
     def setUp(self):
         self._description = 'Category 1'
         self.category = Category.objects.create(

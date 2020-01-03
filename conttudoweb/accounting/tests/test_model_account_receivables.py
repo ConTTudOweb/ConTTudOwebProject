@@ -1,4 +1,5 @@
 from django.test import TestCase
+from tenant_schemas.test.cases import FastTenantTestCase
 
 from ...core.tests.test_model import ModelAdminTest
 from ..models import AccountReceivables
@@ -6,7 +7,7 @@ from ..admin import AccountReceivablesModelAdmin
 from .test_model_account import create_account, AccountAdminTest
 
 
-class AccountReceivablesModelTest(TestCase):
+class AccountReceivablesModelTest(FastTenantTestCase):
     def setUp(self):
         self._description = 'Account Receivables 1'
         self.accountReceivables = AccountReceivables.objects.create(

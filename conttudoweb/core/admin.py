@@ -1,17 +1,17 @@
 from django.contrib import admin
 from django.conf import settings
 
-from .models import Entity, People, City
+from .models import People, City
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
 
-@admin.register(Entity)
-class EntityModelAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+# @admin.register(Entity)
+# class EntityModelAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
 
 
 @admin.register(City)
@@ -25,7 +25,7 @@ class CityModelAdmin(admin.ModelAdmin):
 class PeopleModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
-    exclude = ('entity',)
+    # exclude = ('entity',)
     list_filter = ('customer', 'supplier')
     autocomplete_fields = ('city',)
     radio_fields = {'person_type': admin.HORIZONTAL}

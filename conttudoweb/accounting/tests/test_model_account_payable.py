@@ -1,4 +1,5 @@
 from django.test import TestCase
+from tenant_schemas.test.cases import FastTenantTestCase
 
 from conttudoweb.accounting.utils import AccountFrequencys
 from ...core.tests.test_model import ModelAdminTest
@@ -7,7 +8,7 @@ from ..admin import AccountPayableModelAdmin
 from .test_model_account import create_account, AccountAdminTest
 
 
-class AccountPayableModelTest(TestCase):
+class AccountPayableModelTest(FastTenantTestCase):
     def setUp(self):
         self._description = 'Account Payable 1'
         self._descriptionParcelled = 'Account Payable 1 parcelled'

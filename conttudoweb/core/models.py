@@ -4,15 +4,15 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-class Entity(models.Model):
-    name = models.CharField('nome', max_length=30, unique=True,
-                            help_text='Algo como "Controle Pessoal" ou "Nome da Minha empresa".')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'entidade'
+# class Entity(models.Model):
+#     name = models.CharField('nome', max_length=30, unique=True,
+#                             help_text='Algo como "Controle Pessoal" ou "Nome da Minha empresa".')
+#
+#     def __str__(self):
+#         return self.name
+#
+#     class Meta:
+#         verbose_name = 'entidade'
 
 
 class FederativeUnit(models.Model):
@@ -44,7 +44,7 @@ class People(models.Model):
         natural_person = 'F'
         juridical_person = 'J'
 
-    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
+    # entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     customer = models.BooleanField('cliente?', default=False)
     supplier = models.BooleanField('fornecedor?', default=False)
     name = models.CharField('nome', max_length=30, unique=True)

@@ -1,7 +1,9 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from conttudoweb.core.tests.test_model_entity import get_or_create_entity
+# from conttudoweb.core.tests.test_model_entity import get_or_create_entity
+from tenant_schemas.test.cases import FastTenantTestCase
+
 from ..models import People
 from ..admin import PeopleModelAdmin
 from .test_model import ModelAdminTest
@@ -14,13 +16,13 @@ _name_supplier = 'Supplier 1'
 
 def create_people(**kwargs):
     people = People.objects.create(
-        entity=get_or_create_entity(),
+        # entity=get_or_create_entity(),
         **kwargs
     )
     return people
 
 
-class PeopleModelTest(TestCase):
+class PeopleModelTest(FastTenantTestCase):
     def setUp(self):
         self.people = create_people(name=_name)
 
@@ -46,4 +48,4 @@ class PeopleModelTest(TestCase):
 class PeopleAdminTest(ModelAdminTest, TestCase):
     ModelAdmin = PeopleModelAdmin
     Model = People
-    exclude = ('entity',)
+    # exclude = ('entity',)

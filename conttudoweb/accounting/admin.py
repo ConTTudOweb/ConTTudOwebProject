@@ -46,12 +46,12 @@ class AccountModelAdmin:
     radio_fields = {"type": admin.HORIZONTAL}
     ordering = ['due_date']
 
-    def save_model(self, request, obj, form, change):
-        obj.entity = request.user.entity
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.entity = request.user.entity
+    #     super().save_model(request, obj, form, change)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(entity=request.user.entity)
+    # def get_queryset(self, request):
+    #     return super().get_queryset(request).filter(entity=request.user.entity)
 
     def action(self, obj):
         text = None
