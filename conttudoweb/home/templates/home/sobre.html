@@ -1,0 +1,107 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block content %}
+    <nav class="navbar navbar-default navbar-fixed">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand"><i class="pe-7s-info"></i> SOBRE NÓS</a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <!--<ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#">
+                           <i class="pe-7s-user"></i> Login
+                        </a>
+                    </li>
+                </ul>-->
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-md-12">
+
+                    <div class="card card-plain">
+                        <div class="header">
+                            <h1 class="title">Con<span class="text-warning">TT</span>udO web</h1>
+                            <p class="category">Soluções em Tecnologia</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-12">
+                    <hr/>
+                    <div class="card">
+                        <div class="header navbar-ct-orange">
+                            <h2 class="title">Sobre nós</h2>
+                            <p class="">Conheça um pouco mais nossa empresa!</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-5 col-md-offset-1">
+
+                    <div class="card">
+                        <div class="content">
+                            <p>Atuando no desenvolvimento de soluções de software desde 2014, somos uma empresa focada
+                                em garantir total satisfação de nossos clientes!</p>
+                            <p>Estamos sempre empenhados em entregar o que existe de mais moderno e funcional,
+                                preocupados em manter nossos clientes atualizados e em constante crescimento.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 col-md-offset-2">
+                    <div class="card card-user">
+                        <div class="image">
+                            <img src="{% static 'assets/img/bits_400_300.jpg' %}" alt=""/>
+                        </div>
+                        <div class="content">
+                            <div class="author">
+                                <a href="https://www.linkedin.com/in/alessandrolimafolk/" target="_blank">
+                                    <img class="avatar border-gray"
+                                         src="https://www.gravatar.com/avatar/399d48b39ef431d4552a7be1e6947ae7?s=200"
+                                         alt="Alessandro de Lima Folk"/>
+
+                                    <h4 class="title">Alessandro de Lima Folk<br/>
+                                        <small>CEO e Fundador</small>
+                                    </h4>
+                                </a>
+                            </div>
+                            <p class="description text-center">
+                                "Programador, <br>
+                                Empresário, <br>
+                                e Apaixonado por Tecnologia"
+                            </p>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <a href="https://www.facebook.com/alessandro.delimafolk" target="_blank"
+                               class="btn btn-simple"><i class="fa fa-facebook-square"></i></a>
+                            <a href="https://twitter.com/sandrofolk" target="_blank" class="btn btn-simple"><i
+                                    class="fa fa-twitter"></i></a>
+                            <a href="http://google.com/+AlessandroLimaFolk" target="_blank"
+                               class="btn btn-simple"><i class="fa fa-google-plus-square"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock content %}

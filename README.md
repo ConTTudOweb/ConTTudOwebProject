@@ -18,7 +18,7 @@
 git clone https://github.com/ConTTudOweb/ConTTudOwebProject.git
 cd ConTTudOwebProject
 pipenv --three
-pipenv shell
+pipenv shellre
 pipenv install
 cp contrib/env-sample .env
 python manage.py test

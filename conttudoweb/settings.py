@@ -16,6 +16,8 @@ from decouple import config, Csv
 from dj_database_url import parse as dburl
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from conttudoweb.core.context_processors import EMPRESA_NAME, EMPRESA_SLOGAN
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -50,9 +52,9 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 # Application definition
 
 # customizations
-ADMIN_SITE_TITLE = config('ADMIN_SITE_TITLE', default='ConTTudOweb')
-ADMIN_SITE_HEADER = config('ADMIN_SITE_HEADER', default='ConTTudO soluções web')
-ADMIN_INDEX_TITLE = config('ADMIN_INDEX_TITLE', default='Controles do ConTTudOweb App')
+ADMIN_SITE_TITLE = EMPRESA_NAME
+ADMIN_SITE_HEADER = "%s %s" % (EMPRESA_NAME, EMPRESA_SLOGAN)
+ADMIN_INDEX_TITLE = "Controles Administrativos"
 
 PUBLIC_SCHEMA_NAME = 'public'
 
@@ -72,6 +74,7 @@ TENANT_APPS = [
     "django_extensions",
     "debug_toolbar",
 
+    "conttudoweb.home",
     "conttudoweb.authentication",
     "conttudoweb.core",
     "conttudoweb.accounting",
@@ -100,6 +103,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'conttudoweb.urls'
+PUBLIC_SCHEMA_URLCONF = 'conttudoweb.urls_public'
 
 TEMPLATES = [
     {
@@ -112,6 +116,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'conttudoweb.core.context_processors.consts',
             ],
         },
     },
