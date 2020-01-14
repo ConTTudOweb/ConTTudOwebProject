@@ -1,13 +1,19 @@
 from django.contrib import admin
 
 from conttudoweb.core.forms import PeopleForm
-from .models import People, City
+from .models import People, City, FederativeUnit
 
 
 # @admin.register(Entity)
 # class EntityModelAdmin(admin.ModelAdmin):
 #     list_display = ('name',)
 #     search_fields = ('name',)
+
+
+@admin.register(FederativeUnit)
+class FederativeUnitModelAdmin(admin.ModelAdmin):
+    list_display = ('initials', 'name')
+    search_fields = ('initials', 'name')
 
 
 @admin.register(City)
