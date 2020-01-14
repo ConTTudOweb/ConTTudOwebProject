@@ -47,7 +47,7 @@ class People(models.Model):
     # entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     customer = models.BooleanField('cliente?', default=False)
     supplier = models.BooleanField('fornecedor?', default=False)
-    name = models.CharField('nome', max_length=30, unique=True)
+    name = models.CharField('nome', max_length=60, unique=True)
     person_type = models.CharField('tipo', max_length=1, null=True, blank=True, choices=[
         (PersonTypes.natural_person.value, 'Pessoa Física'),
         (PersonTypes.juridical_person.value, 'Pessoa Jurídica')
