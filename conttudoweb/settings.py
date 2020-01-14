@@ -60,7 +60,14 @@ PUBLIC_SCHEMA_NAME = 'public'
 
 TENANT_MODEL = "tenants.Client"
 
-SHARED_APPS = ["tenant_schemas", "conttudoweb.tenants"]
+SHARED_APPS = [
+    # https://github.com/fabiocaccamo/django-admin-interface
+    "admin_interface",
+    "colorfield",
+
+    "tenant_schemas",
+    "conttudoweb.tenants"
+]
 
 TENANT_APPS = [
     "django.contrib.admin",
@@ -181,4 +188,5 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'
+if not DEVELOPER:
+    DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'

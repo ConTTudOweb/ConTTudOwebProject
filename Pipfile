@@ -19,6 +19,7 @@ Django = "*"
 gunicorn = "*"
 python-dateutil = "*"
 django-tenant-schemas = "*"
+django-admin-interface = "*"
 
 [dev-packages]
 

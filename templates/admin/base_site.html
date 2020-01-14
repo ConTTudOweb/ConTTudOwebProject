@@ -1,20 +1,21 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base_site.html" %}
 {% load static %}
 
 {% block extrastyle %}
+    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/custom.css" %}" />
 {% endblock %}
 
 {% block title %}{{ title }}{% if site_title %} | {{ site_title }}{% endif %}{% endblock %}
 
-{% block branding %}
-<h1 id="site-name">
-    <a href="{% url 'admin:index' %}">
-        <strong>Entidade:</strong> {{ user.entity }}
-    </a>
-    ... <small>{{ site_header }}</small>
-</h1>
-{% endblock %}
+{#{% block branding %}#}
+{#<h1 id="site-name">#}
+{#    <!-- <a href="{% url 'admin:index' %}">#}
+{#        <strong>Entidade:</strong> {{ user.entity }}#}
+{#    </a>#}
+{#    ...  --><small>{{ site_header }}</small>#}
+{#</h1>#}
+{#{% endblock %}#}
 
 {% block nav-global %}{% endblock %}
 

@@ -16,8 +16,9 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import path, include
-
+from django.views.generic import RedirectView
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
@@ -26,6 +27,8 @@ admin.site.index_title = settings.ADMIN_INDEX_TITLE
 urlpatterns = [
                   # path('admin/', admin.site.urls),
                   path('', admin.site.urls),
+
+                  path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('assets/img/favicon.png')))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from conttudoweb.core.forms import PeopleForm
 from .models import People, City
 
 
@@ -27,7 +28,7 @@ class PeopleModelAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-            ('customer', 'supplier'), 'name', 'person_type', 'federation_subscription_number', 'phone', 'email')
+            ('customer', 'supplier'), 'name', ('person_type', 'federation_subscription_number'), ('phone', 'email'))
         }),
         ('Endereço', {
             'classes': ('collapse',),
@@ -37,10 +38,11 @@ class PeopleModelAdmin(admin.ModelAdmin):
             'fields': ('observation',)
         }),
     )
+    form = PeopleForm
 
-    def save_model(self, request, obj, form, change):
-        obj.entity = request.user.entity
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.entity = request.user.entity
+    #     super().save_model(request, obj, form, change)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(entity=request.user.entity)
+    # def get_queryset(self, request):
+    #     return super().get_queryset(request).filter(entity=request.user.entity)
