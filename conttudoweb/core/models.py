@@ -53,6 +53,7 @@ class People(models.Model):
         (PersonTypes.juridical_person.value, 'Pessoa Jurídica')
     ])
     federation_subscription_number = models.CharField('CPF/CNPJ', max_length=18, null=True, blank=True)
+    state_subscription_number = models.CharField('RG/IE', max_length=18, null=True, blank=True)
     phone = models.CharField('telefone', max_length=20, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     zip_code = models.CharField('CEP', max_length=10, null=True, blank=True)

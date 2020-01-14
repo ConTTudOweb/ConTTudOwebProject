@@ -34,7 +34,7 @@ class PeopleModelAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-            ('customer', 'supplier'), 'name', ('person_type', 'federation_subscription_number'), ('phone', 'email'))
+            ('customer', 'supplier'), ('name', 'person_type'), ('federation_subscription_number', 'state_subscription_number'), ('phone', 'email'))
         }),
         ('Endereço', {
             'classes': ('collapse',),
