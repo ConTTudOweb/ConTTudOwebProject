@@ -43,7 +43,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         unique=True,
     )
     password = models.CharField('senha', max_length=128)
-    date_of_birth = models.DateField('data de nascimento', null=True)
+    date_of_birth = models.DateField('data de nascimento', null=True, blank=True)
     is_active = models.BooleanField('ativo?', default=True)
     is_staff = models.BooleanField('funcionário?', default=False)
 
