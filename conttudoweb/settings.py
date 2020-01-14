@@ -109,6 +109,8 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 ROOT_URLCONF = 'conttudoweb.urls'
 PUBLIC_SCHEMA_URLCONF = 'conttudoweb.urls_public'
 
