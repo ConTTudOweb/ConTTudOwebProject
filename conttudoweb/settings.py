@@ -86,6 +86,7 @@ TENANT_APPS = [
     "conttudoweb.core",
     "conttudoweb.accounting",
     "conttudoweb.inventory",
+    "conttudoweb.purchase",
 ]
 
 if DEVELOPER:

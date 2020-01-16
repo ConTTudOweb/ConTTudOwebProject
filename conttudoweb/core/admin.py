@@ -21,12 +21,14 @@ class CityModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'uf')
     search_fields = ('name',)
     list_filter = ('uf',)
+    ordering = ['name']
 
 
 @admin.register(People)
 class PeopleModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+    ordering = ['name']
     # exclude = ('entity',)
     list_filter = ('customer', 'supplier')
     autocomplete_fields = ('city',)
@@ -52,3 +54,10 @@ class PeopleModelAdmin(admin.ModelAdmin):
 
     # def get_queryset(self, request):
     #     return super().get_queryset(request).filter(entity=request.user.entity)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        print(request.path)
+        if 'autocomplete' in request.path:
+            queryset = queryset.filter(supplier=True)
+        return queryset, use_distinct

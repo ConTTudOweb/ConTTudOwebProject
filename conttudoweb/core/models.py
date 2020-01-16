@@ -40,13 +40,15 @@ class City(models.Model):
 
 
 class People(models.Model):
+    supplier_label = 'fornecedor'
+    supplier_verbose_name = '%s?' % supplier_label
     class PersonTypes(enum.Enum):
         natural_person = 'F'
         juridical_person = 'J'
 
     # entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     customer = models.BooleanField('cliente?', default=False)
-    supplier = models.BooleanField('fornecedor?', default=False)
+    supplier = models.BooleanField(supplier_verbose_name, default=False)
     name = models.CharField('nome', max_length=60, unique=True)
     person_type = models.CharField('tipo', max_length=1, null=True, blank=True, choices=[
         (PersonTypes.natural_person.value, 'Pessoa Física'),
