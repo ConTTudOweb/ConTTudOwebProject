@@ -18,7 +18,8 @@ class Product(models.Model):
 
 class ProductBySupplier(models.Model):
     product = models.ForeignKey('inventory.Product', verbose_name=Product._meta.verbose_name, on_delete=models.CASCADE)
-    supplier = models.ForeignKey('core.People', verbose_name=People.supplier_label, on_delete=models.CASCADE)
+    supplier = models.ForeignKey('core.People', verbose_name=People.supplier_label, on_delete=models.CASCADE,
+                                 limit_choices_to={'supplier': True})
     reference = models.CharField('referência', max_length=20, null=True, blank=True)
     description = models.CharField('descrição', max_length=120, null=True, blank=True)
 

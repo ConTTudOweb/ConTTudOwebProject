@@ -5,7 +5,8 @@ from conttudoweb.inventory.models import Product
 
 
 class PurchaseOrder(models.Model):
-    supplier = models.ForeignKey('core.People', limit_choices_to={'supplier': True}, verbose_name=People.supplier_label, on_delete=models.PROTECT)
+    supplier = models.ForeignKey('core.People', verbose_name=People.supplier_label, on_delete=models.PROTECT,
+                                 limit_choices_to={'supplier': True})
     code = models.CharField('código', max_length=20, null=True, blank=True)
     date = models.DateField('data', null=True, blank=True)
     items = models.ManyToManyField('inventory.Product', through='PurchaseItems')
