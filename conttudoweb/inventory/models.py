@@ -18,7 +18,7 @@ class Category(models.Model):
 class Subcategory(models.Model):
     code = models.CharField('código', max_length=20, null=True, blank=True)
     description = models.CharField('descrição', max_length=120)
-    category = models.ForeignKey('Category', on_delete=models.PROTECT)
+    category = models.ForeignKey('Category', verbose_name=Category._meta.verbose_name, on_delete=models.PROTECT)
 
     def __str__(self):
         return "%s - %s" % (self.category.description, self.description)
