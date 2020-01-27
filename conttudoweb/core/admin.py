@@ -57,7 +57,6 @@ class PeopleModelAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-        print(request.path)
         if 'autocomplete' in request.path:
             queryset = queryset.filter(supplier=True)
         return queryset, use_distinct

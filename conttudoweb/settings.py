@@ -60,13 +60,24 @@ PUBLIC_SCHEMA_NAME = 'public'
 
 TENANT_MODEL = "tenants.Client"
 
-SHARED_APPS = [
+COMMON_APPS = [
     # https://github.com/fabiocaccamo/django-admin-interface
     "admin_interface",
     "colorfield",
 
     "tenant_schemas",
     "conttudoweb.tenants"
+]
+
+SHARED_APPS = COMMON_APPS + [
+    "django.contrib.contenttypes",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    "conttudoweb.authentication",
 ]
 
 TENANT_APPS = [
@@ -94,7 +105,7 @@ if DEVELOPER:
         'django.contrib.admindocs',
     ]
 
-INSTALLED_APPS = SHARED_APPS + TENANT_APPS
+INSTALLED_APPS = COMMON_APPS + TENANT_APPS
 
 MIDDLEWARE = [
     'tenant_schemas.middleware.TenantMiddleware',
@@ -192,5 +203,5 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-if not DEVELOPER:
-    DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'
+# if not DEVELOPER:
+DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'

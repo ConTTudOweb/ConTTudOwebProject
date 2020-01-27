@@ -18,13 +18,15 @@ from django.conf.urls.static import static
 from django.urls import path, include
 
 from conttudoweb.home.views import HomeView, PortifolioView, ContatoView, SobreView
+from conttudoweb.tenants.admin import public_admin_site
 
-urlpatterns = [
-                  path('', HomeView.as_view(), name='home'),
-                  path('portifolio', PortifolioView.as_view(), name='portifolio'),
-                  path('contato', ContatoView.as_view(), name='contato'),
-                  path('sobre', SobreView.as_view(), name='sobre'),
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns = [path('', HomeView.as_view(), name='home'),
+               path('portifolio', PortifolioView.as_view(), name='portifolio'),
+               path('contato', ContatoView.as_view(), name='contato'),
+               path('sobre', SobreView.as_view(), name='sobre'),
+
+               path('admin/', public_admin_site.urls),
+               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar

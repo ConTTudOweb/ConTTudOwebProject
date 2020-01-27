@@ -24,12 +24,10 @@ admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
-urlpatterns = [
-                  # path('admin/', admin.site.urls),
-                  path('', admin.site.urls),
+urlpatterns = [path('', admin.site.urls),
 
-                  path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('assets/img/favicon.png')))
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+               path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('assets/img/favicon.png')))
+               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar
