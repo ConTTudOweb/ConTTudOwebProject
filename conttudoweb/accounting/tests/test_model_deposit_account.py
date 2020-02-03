@@ -31,4 +31,4 @@ class DepositAccountModelTest(FastTenantTestCase):
 class DepositAccountAdminTest(ModelAdminTest, TestCase):
     ModelAdmin = DepositAccountModelAdmin
     Model = DepositAccount
-    exclude = ('entity',)
+    # exclude = ('entity',)

@@ -46,4 +46,4 @@ class ClassificationCenterModelTest(FastTenantTestCase):
 class ClassificationCenterAdminTest(ModelAdminTest, TestCase):
     ModelAdmin = ClassificationCenterModelAdmin
     Model = ClassificationCenter
-    exclude = ('entity',)
+    # exclude = ('entity',)
