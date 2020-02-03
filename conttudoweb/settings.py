@@ -185,6 +185,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
@@ -194,11 +196,6 @@ USE_L10N = True
 USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
-
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-except Exception:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
