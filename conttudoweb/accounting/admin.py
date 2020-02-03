@@ -125,15 +125,15 @@ class CategoryModelAdmin(admin.ModelAdmin):
 class ClassificationCenterModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
-    exclude = ('entity',)
+    # exclude = ('entity',)
     fields = ('name', ('cost_center', 'revenue_center'))
 
-    def save_model(self, request, obj, form, change):
-        obj.entity = request.user.entity
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.entity = request.user.entity
+    #     super().save_model(request, obj, form, change)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(entity=request.user.entity)
+    # def get_queryset(self, request):
+    #     return super().get_queryset(request).filter(entity=request.user.entity)
 
 
 class DepositAccountModelForm(forms.ModelForm):
@@ -145,7 +145,7 @@ class DepositAccountModelForm(forms.ModelForm):
 class DepositAccountModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
-    exclude = ('entity',)
+    # exclude = ('entity',)
     autocomplete_fields = ('bank',)
     radio_fields = {"type": admin.HORIZONTAL}
     fieldsets = (
@@ -159,9 +159,9 @@ class DepositAccountModelAdmin(admin.ModelAdmin):
     )
     form = DepositAccountModelForm
 
-    def save_model(self, request, obj, form, change):
-        obj.entity = request.user.entity
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.entity = request.user.entity
+    #     super().save_model(request, obj, form, change)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(entity=request.user.entity)
+    # def get_queryset(self, request):
+    #     return super().get_queryset(request).filter(entity=request.user.entity)
