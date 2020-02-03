@@ -195,7 +195,10 @@ USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
 
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+except Exception:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
