@@ -8,11 +8,11 @@ class PurchaseOrder(models.Model):
     supplier = models.ForeignKey('core.People', verbose_name=People.supplier_label, on_delete=models.PROTECT,
                                  limit_choices_to={'supplier': True})
     code = models.CharField('código', max_length=20, null=True, blank=True)
-    date = models.DateField('data', null=True, blank=True)
+    date = models.DateField('data', null=True, blank=False)
     items = models.ManyToManyField('inventory.Product', through='PurchaseItems')
 
     def __str__(self):
-        return "ID%s - %s" % (self.id, self.supplier)
+        return "#%s - %s" % (self.id, self.supplier)
 
     class Meta:
         verbose_name = 'ordem de compra'
