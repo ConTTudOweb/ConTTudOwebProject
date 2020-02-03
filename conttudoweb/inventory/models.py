@@ -1,10 +1,8 @@
-import locale
-
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.formats import localize
 
 from conttudoweb.core.models import People
+from conttudoweb.core.utils import format_currency
 
 
 class UnitOfMeasure(models.Model):
@@ -57,7 +55,8 @@ class Product(models.Model):
     def last_cost_price(self):
         item = self.purchaseitems_set.order_by('-purchase_order__date').first()
         if item:
-            return locale.currency((item.amount / item.quantity), grouping=True)
+            # return locale.currency((item.amount / item.quantity), grouping=True)
+            return format_currency((item.amount / item.quantity))
         return None
 
     last_cost_price.short_description = 'último preço de custo'
