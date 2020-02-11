@@ -40,11 +40,11 @@
         },
         "django": {
             "hashes": [
-                "sha256:4f2c913303be4f874015993420bf0bd8fd2097a9c88e6b49c6a92f9bdd3fb13a",
-                "sha256:8c3575f81e11390893860d97e1e0154c47512f180ea55bd84ce8fa69ba8051ca"
+                "sha256:2f1ba1db8648484dd5c238fb62504777b7ad090c81c5f1fd8d5eb5ec21b5f283",
+                "sha256:c91c91a7ad6ef67a874a4f76f58ba534f9208412692a840e1d125eb5c279cb0a"
             ],
             "index": "pypi",
-            "version": "==3.0.2"
+            "version": "==3.0.3"
         },
         "django-admin-interface": {
             "hashes": [
@@ -56,10 +56,10 @@
         },
         "django-colorfield": {
             "hashes": [
-                "sha256:663e527247719469aae155859cb4d2f8938f54c2c722e714f6370bece5e7a8d2",
-                "sha256:cbaecbd2f66b0e3202ba30370ff16c402a49295feef2bc56c56cdc97d148ec80"
+                "sha256:c4435b4fead2bb1113e97dc21390ac843a3d942d5ad6f4b1a23644a208f5e9ed",
+                "sha256:ea72e1ce422c3516df0d2d590516e96127ff6462837fffbf0d51a0a34d05d517"
             ],
-            "version": "==0.1.15"
+            "version": "==0.1.17"
         },
         "django-debug-toolbar": {
             "hashes": [
@@ -79,14 +79,12 @@
         },
         "django-flat-responsive": {
             "hashes": [
-                "sha256:451caa2700c541b52fb7ce2d34d3d8dee9e980cf29f5463bc8a8c6256a1a6474",
-                "sha256:de5d62d4456e6f5b3016cf841352bbdb569080fab65ce4a67094ea58b106c113"
+                "sha256:451caa2700c541b52fb7ce2d34d3d8dee9e980cf29f5463bc8a8c6256a1a6474"
             ],
             "version": "==2.0"
         },
         "django-flat-theme": {
             "hashes": [
-                "sha256:0f6698f779b49aa4aecf7b03fb7da2cdd6c400ad98f09debf0f770eaf5196488",
                 "sha256:6b522d8c2b5a8228b30947fb002eff2868da076e9beacf3e798410e5c1a2d849"
             ],
             "version": "==1.1.4"
