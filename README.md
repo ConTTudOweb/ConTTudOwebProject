@@ -31,6 +31,13 @@ python manage.py shell_plus
 Client.objects.create(name="sandrofolk", schema_name="sandrofolk", domain_url="sandrofolk.conttudoweb.local")
 
 python manage.py tenant_command createsuperuser --schema=sandrofolk
+
+# Verificar pacotes desatualizados:
+pipenv update --outdated
+# Atualizar um pacote específico:
+pipenv update PACOTE
+# Atualizar todos os pacotes desatualizados:
+pipenv update
 ```
 
 ```
