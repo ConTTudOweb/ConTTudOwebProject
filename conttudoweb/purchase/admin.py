@@ -11,5 +11,8 @@ class PurchaseItemsInline(admin.TabularInline):
 
 @admin.register(PurchaseOrder)
 class PurchaseOrderModelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'supplier', 'code', 'date']
+    list_display_links = ['id', 'supplier']
     autocomplete_fields = ['supplier']
     inlines = [PurchaseItemsInline]
+    ordering = ['-date']
