@@ -26,6 +26,10 @@ admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
 urlpatterns = [path('', admin.site.urls),
 
+               # path('api/', include('kmadmin.apps.api.urls')),
+               path('api-auth/', include('rest_framework.urls')),
+               path('rest-auth/', include('rest_auth.urls')),
+
                path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('assets/img/favicon.png')))
                ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -20,6 +20,10 @@ gunicorn = "*"
 python-dateutil = "*"
 django-tenant-schemas = "*"
 django-admin-interface = "*"
+django-cors-headers = "*"
+djangorestframework = "*"
+django-rest-auth = "*"
+django-filter = "*"
 
 [dev-packages]
 

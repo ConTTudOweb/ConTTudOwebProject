@@ -88,6 +88,11 @@ TENANT_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    "corsheaders",
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'django_filters',
     "test_without_migrations",
     "django_extensions",
     "debug_toolbar",
@@ -109,12 +114,16 @@ INSTALLED_APPS = COMMON_APPS + TENANT_APPS
 
 MIDDLEWARE = [
     'tenant_schemas.middleware.TenantMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     # 'tenant_schemas.middleware.DefaultTenantMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
+    # 'corsheaders.middleware.CorsPostCsrfMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -209,3 +218,32 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # if not DEVELOPER:
 DEFAULT_FILE_STORAGE = 'tenant_schemas.storage.TenantFileSystemStorage'
+
+
+# DRF (API)
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 5,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissions'
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'COERCE_DECIMAL_TO_STRING': False,
+}
+
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'conttudoweb.authentication.serializers.TokenSerializer',
+    # 'USER_DETAILS_SERIALIZER': 'core.serializers.UserSerializer',
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_REPLACE_HTTPS_REFERER = True
+#
+# CSRF_TRUSTED_ORIGINS = (
+#     '.conttudoweb.com.br',
+# )
