@@ -19,14 +19,20 @@ from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import path, include
 from django.views.generic import RedirectView
+from rest_framework import routers
+
+from .core.views import FederativeUnitViewSet
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
+router = routers.DefaultRouter(trailing_slash=True)
+router.register('federative-unit', FederativeUnitViewSet)
+
 urlpatterns = [path('', admin.site.urls),
 
-               # path('api/', include('kmadmin.apps.api.urls')),
+               path('api/', include(router.urls)),
                path('api-auth/', include('rest_framework.urls')),
                path('rest-auth/', include('rest_auth.urls')),
 

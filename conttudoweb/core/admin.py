@@ -26,8 +26,8 @@ class CityModelAdmin(admin.ModelAdmin):
 
 @admin.register(People)
 class PeopleModelAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('name', 'observation')
+    search_fields = ('name', 'observation')
     ordering = ['name']
     # exclude = ('entity',)
     list_filter = ('customer', 'supplier')
