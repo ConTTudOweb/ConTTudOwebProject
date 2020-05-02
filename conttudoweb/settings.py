@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import locale
 import os
 
+from corsheaders.defaults import default_headers
 from decouple import config, Csv
 from dj_database_url import parse as dburl
 
@@ -113,7 +114,8 @@ if DEVELOPER:
 INSTALLED_APPS = COMMON_APPS + TENANT_APPS
 
 MIDDLEWARE = [
-    'tenant_schemas.middleware.TenantMiddleware',
+    # 'tenant_schemas.middleware.TenantMiddleware',
+    'conttudoweb.tenants.middleware.TenantMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     # 'tenant_schemas.middleware.DefaultTenantMiddleware',
 
@@ -241,6 +243,10 @@ REST_AUTH_SERIALIZERS = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'Tenant',
+]
 
 # CORS_REPLACE_HTTPS_REFERER = True
 #

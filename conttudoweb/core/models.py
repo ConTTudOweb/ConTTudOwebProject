@@ -24,6 +24,7 @@ class FederativeUnit(models.Model):
 
     class Meta:
         verbose_name = 'unidade federativa'
+        ordering = ('name',)
 
 
 class City(models.Model):
