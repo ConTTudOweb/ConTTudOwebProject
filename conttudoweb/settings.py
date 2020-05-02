@@ -249,6 +249,10 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'Access-Control-Allow-Origin'
 ]
 
+CORS_EXPOSE_HEADERS = [
+    'Tenant'
+]
+
 # CORS_REPLACE_HTTPS_REFERER = True
 #
 # CSRF_TRUSTED_ORIGINS = (
