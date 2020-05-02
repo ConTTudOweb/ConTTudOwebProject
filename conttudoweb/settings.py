@@ -115,8 +115,8 @@ INSTALLED_APPS = COMMON_APPS + TENANT_APPS
 
 MIDDLEWARE = [
     # 'tenant_schemas.middleware.TenantMiddleware',
-    'conttudoweb.tenants.middleware.TenantMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'conttudoweb.tenants.middleware.TenantMiddleware',
     # 'tenant_schemas.middleware.DefaultTenantMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
