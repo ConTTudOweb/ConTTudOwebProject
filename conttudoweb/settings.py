@@ -246,6 +246,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'Tenant',
+    'Access-Control-Allow-Origin'
 ]
 
 # CORS_REPLACE_HTTPS_REFERER = True
