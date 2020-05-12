@@ -21,7 +21,7 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from rest_framework import routers
 
-from .core.views import FederativeUnitViewSet
+from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
@@ -29,6 +29,8 @@ admin.site.index_title = settings.ADMIN_INDEX_TITLE
 
 router = routers.DefaultRouter(trailing_slash=True)
 router.register('federative-unit', FederativeUnitViewSet)
+router.register('city', CityViewSet)
+router.register('people', PeopleViewSet)
 
 urlpatterns = [path('', admin.site.urls),
 
