@@ -9,7 +9,14 @@ class FederativeUnitSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class FederativeUnitField(serializers.RelatedField):
+    def to_representation(self, value):
+        return str(value)
+
+
 class CitySerializer(serializers.ModelSerializer):
+    uf__initials = serializers.CharField(source='uf.initials', read_only=True)
+
     class Meta:
         model = models.City
         fields = '__all__'
