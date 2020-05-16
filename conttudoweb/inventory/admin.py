@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from conttudoweb.inventory.models import Product, ProductBySupplier, Category, Subcategory, UnitOfMeasure
+from conttudoweb.inventory.models import Product, ProductBySupplier, Category, Subcategory, UnitOfMeasure, \
+    ProductSizeRegister, ProductSize
 
 
 class SubcategoryInline(admin.TabularInline):
@@ -19,6 +20,24 @@ class SubcategoryModelAdmin(admin.ModelAdmin):
     search_fields = ['description']
     autocomplete_fields = ['category']
     list_filter = ['category']
+
+
+class ProductSizeInline(admin.TabularInline):
+    model = ProductSize
+    extra = 0
+
+
+@admin.register(ProductSizeRegister)
+class ProductSizeRegisterModelAdmin(admin.ModelAdmin):
+    inlines = [ProductSizeInline]
+    search_fields = ['description']
+
+
+@admin.register(ProductSize)
+class ProductSizeModelAdmin(admin.ModelAdmin):
+    search_fields = ['description']
+    autocomplete_fields = ['product_size_register']
+    list_filter = ['product_size_register']
 
 
 @admin.register(UnitOfMeasure)

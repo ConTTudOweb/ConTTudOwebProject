@@ -104,6 +104,7 @@ TENANT_APPS = [
     "conttudoweb.accounting",
     "conttudoweb.inventory",
     "conttudoweb.purchase",
+    "conttudoweb.sale",
 ]
 
 if DEVELOPER:
@@ -207,6 +208,8 @@ USE_L10N = True
 USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

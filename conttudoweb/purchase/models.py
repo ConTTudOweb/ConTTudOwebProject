@@ -21,7 +21,7 @@ class PurchaseOrder(models.Model):
 
 class PurchaseItems(models.Model):
     purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE)
-    product = models.ForeignKey('inventory.Product', verbose_name=Product._meta.verbose_name, on_delete=models.CASCADE)
+    product = models.ForeignKey('inventory.Product', verbose_name=Product._meta.verbose_name, on_delete=models.PROTECT)
     quantity = models.DecimalField('quantidade', max_digits=15, decimal_places=2)
     # price = models.DecimalField('preço', max_digits=15, decimal_places=2)
     amount = models.DecimalField('valor total', max_digits=15, decimal_places=2)

@@ -40,6 +40,28 @@ class Subcategory(models.Model):
         verbose_name = 'subcategoria'
 
 
+class ProductSizeRegister(models.Model):
+    description = models.CharField('descrição', max_length=120)
+
+    def __str__(self):
+        return self.description
+
+    class Meta:
+        verbose_name = 'grade'
+
+
+class ProductSize(models.Model):
+    description = models.CharField('descrição', max_length=6)
+    product_size_register = models.ForeignKey('ProductSizeRegister', verbose_name=ProductSizeRegister._meta.verbose_name, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.description
+
+    class Meta:
+        verbose_name = 'item de grade'
+        verbose_name_plural = 'itens de grade'
+
+
 class Product(models.Model):
     code = models.CharField('código', max_length=20, null=True, blank=True)
     description = models.CharField('descrição', max_length=120)
@@ -48,6 +70,13 @@ class Product(models.Model):
                                     on_delete=models.PROTECT, null=True, blank=True)
     unit_of_measure = models.ForeignKey('UnitOfMeasure', verbose_name=UnitOfMeasure._meta.verbose_name,
                                         on_delete=models.PROTECT, null=True, blank=False)
+    product_size_register = models.ForeignKey('ProductSizeRegister',
+                                              verbose_name=ProductSizeRegister._meta.verbose_name,
+                                              on_delete=models.PROTECT, null=True, blank=True)
+    cost_price = models.DecimalField('preço de custo', max_digits=15, decimal_places=2, null=True, blank=True)
+    sale_price = models.DecimalField('preço de venda', max_digits=15, decimal_places=2, null=True, blank=True)
+    wholesale_selling_price = models.DecimalField('preço de venda atacado', max_digits=15, decimal_places=2, null=True,
+                                                  blank=True)
 
     def __str__(self):
         return "%s (%s)" % (self.description, self.unit_of_measure)
@@ -57,7 +86,8 @@ class Product(models.Model):
         if item:
             # return locale.currency((item.amount / item.quantity), grouping=True)
             return format_currency((item.amount / item.quantity))
-        return None
+        else:
+            return format_currency(self.cost_price)
 
     last_cost_price.short_description = 'último preço de custo'
 
