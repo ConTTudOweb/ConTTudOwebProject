@@ -29,7 +29,7 @@ class AccountReceivablesModelForm(AccountModelForm):
 class AccountModelAdmin:
     list_display = ('__str__', 'due_date', 'amount', 'category', 'person', 'action')
     search_fields = ('description',)
-    exclude = ('entity',)
+    # exclude = ('entity',)
     autocomplete_fields = ('category',)
     raw_id_fields = ('person',)  # TODO: autocomplete_fields não está funcionando com limit_choices_to
     fieldsets = (

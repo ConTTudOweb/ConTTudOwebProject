@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.timezone import now
 
 from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence
+from conttudoweb.sale.models import SaleOrder
 
 
 class Category(models.Model):
@@ -143,6 +144,13 @@ class Account(models.Model):
         normal = 'nor'
         recurrent = 'rec'
         parcelled = 'par'
+    TYPE_CHOICES_INLINES = [
+        (AccountTypes.normal.value, 'Normal'),
+        (AccountTypes.parcelled.value, 'Parcelada'),
+    ]
+    TYPE_CHOICES = TYPE_CHOICES_INLINES + [
+        (AccountTypes.recurrent.value, 'Recorrente'),
+    ]
 
     # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
@@ -156,13 +164,10 @@ class Account(models.Model):
                                       "Contas normais vencem apenas uma vez. \n"
                                       "Contas recorrentes vencem uma vez por período indefinidamente. \n"
                                       "Contas parceladas têm um número fixo de vencimentos pré-estipulado.'>?</a>",
-                            choices=[
-                                (AccountTypes.normal.value, 'Normal'),
-                                (AccountTypes.recurrent.value, 'Recorrente'),
-                                (AccountTypes.parcelled.value, 'Parcelada'),
-                            ])
+                            choices=TYPE_CHOICES)
     frequency = models.CharField('frequência', max_length=15, null=True, blank=True,
-                                 help_text="Obrigatório quando o tipo é 'Recorrente'.",
+                                 default=AccountFrequencys.monthly.value,
+                                 help_text="Obrigatório caso o tipo seja 'Parcelada' ou 'Recorrente'.",
                                  choices=[
                                      (AccountFrequencys.weekly.value, 'Semanal'),
                                      (AccountFrequencys.biweekly.value, 'Quinzenal'),
@@ -172,7 +177,7 @@ class Account(models.Model):
                                      (AccountFrequencys.semiannual.value, 'Semestral'),
                                      (AccountFrequencys.annual.value, 'Anual'),
                                  ])
-    number_of_parcels = models.PositiveIntegerField('número de parcelas', null=True, blank=True,
+    number_of_parcels = models.PositiveIntegerField('nro. de parcelas', null=True, blank=True,
                                                     help_text="Obrigatório caso o tipo seja 'Parcelada'.", )
     parcel = models.PositiveIntegerField(null=True, blank=True, editable=False)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, blank=True,
@@ -272,11 +277,22 @@ class AccountPayable(Account):
 
 
 class AccountReceivables(Account):
-    person = models.ForeignKey('core.People', on_delete=models.CASCADE, null=True, blank=True,
+    person = models.ForeignKey('core.People', on_delete=models.PROTECT, null=True, blank=True,
                                verbose_name='cliente', limit_choices_to={'customer': True})
     classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
                                               verbose_name='classificação', limit_choices_to={'revenue_center': True})
     liquidated = models.BooleanField('recebido?', default=False)
+    sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
+                                   verbose_name=SaleOrder._meta.verbose_name)
+
+    def save(self, *args, **kwargs):
+        if self.sale_order:
+            if self.description in [None, '']:
+                self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
+            self.document_emission_date = self.sale_order.date
+            self.person = self.sale_order.customer
+            # self.save()
+        super(AccountReceivables, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'conta à receber'

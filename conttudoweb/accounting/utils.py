@@ -31,27 +31,30 @@ def get_due_date(due_date, frequency, parcel=None, day=None):
 
     # Mensal
     elif frequency == AccountFrequencys.monthly.value:
-        _due_date = due_date + relativedelta(months=+parcel)
-        _day = day
-        while True:
-            try:
-                _due_date = datetime.date(year=_due_date.year, day=_day, month=_due_date.month)
-                break
-            except ValueError:
-                if _day <= 28:
+        if not day:
+            return due_date + relativedelta(months=+parcel)
+        else:
+            _due_date = due_date + relativedelta(months=+parcel)
+            _day = day
+            while True:
+                try:
+                    _due_date = datetime.date(year=_due_date.year, day=_day, month=_due_date.month)
                     break
-                else:
-                    _day -= 1
-        return _due_date
+                except ValueError:
+                    if _day <= 28:
+                        break
+                    else:
+                        _day -= 1
+            return _due_date
 
     elif frequency == AccountFrequencys.bimonthly.value:
-        return due_date + relativedelta(months=+((parcel)*2))
+        return due_date + relativedelta(months=+(parcel*2))
     elif frequency == AccountFrequencys.quarterly.value:
-        return due_date + relativedelta(months=+((parcel)*3))
+        return due_date + relativedelta(months=+(parcel*3))
     elif frequency == AccountFrequencys.semiannual.value:
-        return due_date + relativedelta(months=+((parcel)*6))
+        return due_date + relativedelta(months=+(parcel*6))
     elif frequency == AccountFrequencys.annual.value:
-        return due_date + relativedelta(years=+(parcel))
+        return due_date + relativedelta(years=+parcel)
 
 
 # def get_due_date(due_date, frequency, parcel):
