@@ -2,8 +2,10 @@ import enum
 from copy import deepcopy
 
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Sum
 from django.utils.timezone import now
 
 from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence
@@ -55,6 +57,21 @@ class DepositAccount(models.Model):
     account_digit = models.CharField('dígito da conta', max_length=2, null=True, blank=True)
 
     name = models.CharField('nome da conta', max_length=30)
+
+    def balance(self):
+        balance = Decimal(0)
+        received = AccountReceivables.objects.filter(
+            expected_deposit_account=self, liquidated=True
+        ).aggregate(Sum('amount'))
+        if received['amount__sum']:
+            balance += received['amount__sum']
+        paid = AccountPayable.objects.filter(
+            expected_deposit_account=self, liquidated=True
+        ).aggregate(Sum('amount'))
+        if paid['amount__sum']:
+            balance -= paid['amount__sum']
+        return balance
+    balance.short_description = 'saldo'
 
     def __str__(self):
         return self.name
@@ -186,7 +203,8 @@ class Account(models.Model):
     expected_deposit_account = models.ForeignKey('DepositAccount', on_delete=models.CASCADE, null=True, blank=True)
     observation = models.TextField('observação', null=True, blank=True)
     parent = models.IntegerField(null=True, blank=True, editable=False)
-    reconciled = models.BooleanField('conciliado', default=False)
+    liquidated = models.BooleanField('liquidado?', default=False)
+    reconciled = models.BooleanField('conciliado?', default=False)
 
     __original_description = None
 
@@ -269,11 +287,10 @@ class AccountPayable(Account):
                                verbose_name='fornecedor', limit_choices_to={'supplier': True})
     classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
                                               verbose_name='classificação', limit_choices_to={'cost_center': True})
-    liquidated = models.BooleanField('pago?', default=False)
+    # liquidated = models.BooleanField('pago?', default=False)
 
     class Meta:
-        verbose_name = 'conta à pagar'
-        verbose_name_plural = 'contas à pagar'
+        verbose_name = 'pagamento'
 
 
 class AccountReceivables(Account):
@@ -281,7 +298,7 @@ class AccountReceivables(Account):
                                verbose_name='cliente', limit_choices_to={'customer': True})
     classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
                                               verbose_name='classificação', limit_choices_to={'revenue_center': True})
-    liquidated = models.BooleanField('recebido?', default=False)
+    # liquidated = models.BooleanField('recebido?', default=False)
     sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
                                    verbose_name=SaleOrder._meta.verbose_name)
 
@@ -295,5 +312,8 @@ class AccountReceivables(Account):
         super(AccountReceivables, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'conta à receber'
-        verbose_name_plural = 'contas à receber'
+        verbose_name = 'recebimento'
+
+
+# class FinancialMovement(models.Model):
+#     pass

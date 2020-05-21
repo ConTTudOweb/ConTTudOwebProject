@@ -1,9 +1,11 @@
 from django import forms
-from django.contrib import admin
-from django.urls import reverse
+from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse, path
 from django.utils.html import format_html
 
-from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, Recurrence
+from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
+    Recurrence, Account
 
 
 class AccountModelForm(forms.ModelForm):
@@ -27,7 +29,9 @@ class AccountReceivablesModelForm(AccountModelForm):
 
 
 class AccountModelAdmin:
-    list_display = ('__str__', 'due_date', 'amount', 'category', 'person', 'action')
+    list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated',
+                    'action')
+    list_editable = ('liquidated',)
     search_fields = ('description',)
     # exclude = ('entity',)
     autocomplete_fields = ('category',)
@@ -52,6 +56,11 @@ class AccountModelAdmin:
 
     # def get_queryset(self, request):
     #     return super().get_queryset(request).filter(entity=request.user.entity)
+
+    def title(self, obj):
+        return str(obj)
+    title.short_description = Account._meta.get_field('description').verbose_name
+    title.admin_order_field = 'description'
 
     def action(self, obj):
         text = None
@@ -87,9 +96,24 @@ class AccountModelAdmin:
             )
         else:
             return ""
-
     action.short_description = ''
     action.allow_tags = True
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if request.method == 'POST':
+            if '_process' in request.POST:
+                # super().change_view(request, object_id, form_url, extra_context)
+                obj = self.model.objects.get(pk=object_id)
+                obj.liquidated = True
+                obj.save()
+
+                self.message_user(
+                    request,
+                    "Baixa efetuada '{}'.".format(str(obj)),
+                    messages.SUCCESS)
+                return HttpResponseRedirect("../")
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
 
 @admin.register(Recurrence)
@@ -101,6 +125,12 @@ class RecurrenceModelAdmin(admin.ModelAdmin):
 class AccountPayableModelAdmin(AccountModelAdmin, admin.ModelAdmin):
     form = AccountPayableModelForm
     change_form_template = 'change_form_accountPayable.html'
+
+    def has_change_permission(self, request, obj=None):
+        if obj:
+            return not obj.liquidated
+        else:
+            return super(AccountPayableModelAdmin, self).has_change_permission(request, obj)
 
 
 @admin.register(AccountReceivables)
@@ -143,7 +173,7 @@ class DepositAccountModelForm(forms.ModelForm):
 
 @admin.register(DepositAccount)
 class DepositAccountModelAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'balance')
     search_fields = ('name',)
     # exclude = ('entity',)
     autocomplete_fields = ('bank',)

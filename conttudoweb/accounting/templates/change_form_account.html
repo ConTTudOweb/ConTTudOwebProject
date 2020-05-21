@@ -1,8 +1,10 @@
 {% extends 'admin/change_form.html' %}
 
-{% block object-tools-items %}
-    <li><a href="#">
-        {% block text_liquidated %}{% endblock %}
-    </a></li>
+{% block submit_buttons_bottom %}
+    {% if original.pk %}
+    <div class="submit-row" style="background-color: transparent; border: transparent;">
+        <input type="submit" value="{% block text_liquidated %}{% endblock %}" name="_process">
+    </div>
+    {% endif %}
     {{ block.super }}
 {% endblock %}
