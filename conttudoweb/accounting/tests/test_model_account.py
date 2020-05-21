@@ -28,4 +28,5 @@ def create_account(_description, **kwargs):
 
 
 class AccountAdminTest:
-    exclude = ('entity',)
+    # exclude = ('entity',)
+    pass
