@@ -29,8 +29,7 @@ class AccountReceivablesModelForm(AccountModelForm):
 
 
 class AccountModelAdmin:
-    list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated',
-                    'action')
+    list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated')
     list_editable = ('liquidated',)
     search_fields = ('description',)
     # exclude = ('entity',)
@@ -104,16 +103,26 @@ class AccountModelAdmin:
             if '_process' in request.POST:
                 # super().change_view(request, object_id, form_url, extra_context)
                 obj = self.model.objects.get(pk=object_id)
-                obj.liquidated = True
+                obj.liquidated = not obj.liquidated
                 obj.save()
 
+                if obj.liquidated:
+                    msg = "Baixa efetuada '{}'."
+                else:
+                    msg = "Estorno efetuado '{}'."
                 self.message_user(
                     request,
-                    "Baixa efetuada '{}'.".format(str(obj)),
+                    msg.format(str(obj)),
                     messages.SUCCESS)
                 return HttpResponseRedirect("../")
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
+    def has_change_permission(self, request, obj=None):
+        if obj:
+            return not obj.liquidated
+        else:
+            return super().has_change_permission(request, obj)
 
 
 @admin.register(Recurrence)
@@ -125,12 +134,6 @@ class RecurrenceModelAdmin(admin.ModelAdmin):
 class AccountPayableModelAdmin(AccountModelAdmin, admin.ModelAdmin):
     form = AccountPayableModelForm
     change_form_template = 'change_form_accountPayable.html'
-
-    def has_change_permission(self, request, obj=None):
-        if obj:
-            return not obj.liquidated
-        else:
-            return super(AccountPayableModelAdmin, self).has_change_permission(request, obj)
 
 
 @admin.register(AccountReceivables)
