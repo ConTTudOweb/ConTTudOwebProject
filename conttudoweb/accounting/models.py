@@ -313,7 +313,3 @@ class AccountReceivables(Account):
 
     class Meta:
         verbose_name = 'recebimento'
-
-
-# class FinancialMovement(models.Model):
-#     pass
