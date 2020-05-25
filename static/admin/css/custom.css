@@ -1,3 +1,14 @@
-/*#header {*/
-    /*height: auto;*/
-/*}*/
+span.account-saldo-title {
+    font-size: large
+}
+
+span.account-saldo {
+    font-size: x-large;
+    font-weight: bold;
+    padding-left: 20px;
+    color: darkgreen;
+}
+
+span.account-saldo-negativo {
+    color: darkred;
+}

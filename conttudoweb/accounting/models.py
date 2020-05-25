@@ -5,10 +5,15 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.timezone import now
 
-from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence
+from conttudoweb.accounting.managers import AccountReceivableManager, AccountPayableManager, FinancialMovementManager
+from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence, \
+    PAYMENT_RECEIVEMENT_CHOICES, AccountPaymentReceivement
 from conttudoweb.sale.models import SaleOrder
 
 
@@ -60,16 +65,16 @@ class DepositAccount(models.Model):
 
     def balance(self):
         balance = Decimal(0)
-        received = AccountReceivables.objects.filter(
+        query = Account.objects.filter(
             expected_deposit_account=self, liquidated=True
-        ).aggregate(Sum('amount'))
-        if received['amount__sum']:
-            balance += received['amount__sum']
-        paid = AccountPayable.objects.filter(
-            expected_deposit_account=self, liquidated=True
-        ).aggregate(Sum('amount'))
-        if paid['amount__sum']:
-            balance -= paid['amount__sum']
+        ).aggregate(
+            received=Sum('amount', filter=Q(payment_receivement=AccountPaymentReceivement.receivement.value)),
+            paid=Sum('amount', only=Q(payment_receivement=AccountPaymentReceivement.payment.value))
+        )
+        if query['received']:
+            balance += query['received']
+        if query['paid']:
+            balance -= query['paid']
         return balance
     balance.short_description = 'saldo'
 
@@ -134,11 +139,8 @@ class Recurrence(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if AccountPayable.objects.filter(recurrence_key=self).exists() or AccountReceivables.objects.filter(recurrence_key=self).exists():
-            if AccountPayable.objects.filter(recurrence_key=self).exists():
-                last = AccountPayable.objects.filter(recurrence_key=self).order_by('-recurrence_count').first()
-            else:
-                last = AccountReceivables.objects.filter(recurrence_key=self).order_by('-recurrence_count').first()
+        if Account.objects.filter(recurrence_key=self).exists():
+            last = Account.objects.filter(recurrence_key=self).order_by('-recurrence_count').first()
 
             if self.date > last.due_date:
                 due_date = last.due_date
@@ -169,11 +171,19 @@ class Account(models.Model):
         (AccountTypes.recurrent.value, 'Recorrente'),
     ]
 
+    # class AccountPaymentReceivement(enum.Enum):
+    #     payment = 'p'
+    #     receivement = 'r'
+    # PAYMENT_RECEIVEMENT_CHOICES = [
+    #     (AccountPaymentReceivement.payment.value, 'Pagamento'),
+    #     (AccountPaymentReceivement.receivement.value, 'Recebimento'),
+    # ]
+
     # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
     amount = models.DecimalField('valor', max_digits=15, decimal_places=2)
-    due_date = models.DateField('data de vencimento')
+    due_date = models.DateField('data de vencimento', null=True, blank=False)
     recurrence_key = models.ForeignKey('Recurrence', on_delete=models.PROTECT, null=True, blank=True, editable=False)
     recurrence_count = models.IntegerField(null=True, blank=True, editable=False)
     type = models.CharField('tipo', max_length=3, default=AccountTypes.normal.value,
@@ -200,13 +210,34 @@ class Account(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, blank=True,
                                  verbose_name=Category._meta.verbose_name)
     document_emission_date = models.DateField('data de emissão', null=True, blank=True)
-    expected_deposit_account = models.ForeignKey('DepositAccount', on_delete=models.CASCADE, null=True, blank=True)
+    expected_deposit_account = models.ForeignKey('DepositAccount', on_delete=models.CASCADE, null=True, blank=True,
+                                                 verbose_name=DepositAccount._meta.verbose_name)
     observation = models.TextField('observação', null=True, blank=True)
     parent = models.IntegerField(null=True, blank=True, editable=False)
     liquidated = models.BooleanField('liquidado?', default=False)
-    reconciled = models.BooleanField('conciliado?', default=False)
+    liquidated_date = models.DateField('data da liquidação', null=True, blank=False)
+    # reconciled = models.BooleanField('conciliado?', default=False)
+
+    payment_receivement = models.CharField('pagamento/recebimento', max_length=1, choices=PAYMENT_RECEIVEMENT_CHOICES)
+    person = models.ForeignKey('core.People', on_delete=models.PROTECT, null=True, blank=True,
+                               verbose_name='cliente/fornecedor')
+    classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
+                                              verbose_name='centro de receita/custo')
+    financial_movement = models.BooleanField(default=False)
+    sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
+                                   verbose_name=SaleOrder._meta.verbose_name)
 
     __original_description = None
+
+    def title(self):
+        return str(self)
+    title.short_description = 'descrição'
+    title.admin_order_field = 'description'
+
+    def amount_converted(self):
+        if self.payment_receivement == AccountPaymentReceivement.payment.value:
+            return self.amount*-1
+        return self.amount
 
     def __str__(self):
         if self.type == self.AccountTypes.parcelled.value:
@@ -241,6 +272,17 @@ class Account(models.Model):
             self.parent = None
 
     def save(self, *args, **kwargs):
+        if self.sale_order:
+            if self.description in [None, '']:
+                self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
+            self.document_emission_date = self.sale_order.date
+            self.person = self.sale_order.customer
+
+        if self.liquidated and not self.liquidated_date:
+            self.liquidated_date = timezone.now()
+        elif not self.liquidated and self.liquidated_date:
+            self.liquidated_date = None
+
         super(Account, self).save(*args, **kwargs)
 
         if self.type == self.AccountTypes.parcelled.value and self.parent is None:
@@ -276,40 +318,82 @@ class Account(models.Model):
                     self.recurrence_key.date = date_max
                     self.recurrence_key.save()
 
-        # super(Account, self).save(*args, **kwargs)
 
-    class Meta:
-        abstract = True
+def _account_post_delete(instance):
+    try:
+        if instance.recurrence_key:
+            if not Account.objects.filter(recurrence_key=instance.recurrence_key).exists():
+                Recurrence.objects.filter(pk=instance.recurrence_key.pk).delete()
+    except Recurrence.DoesNotExist:
+        pass
 
 
 class AccountPayable(Account):
-    person = models.ForeignKey('core.People', on_delete=models.CASCADE, null=True, blank=True,
-                               verbose_name='fornecedor', limit_choices_to={'supplier': True})
-    classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
-                                              verbose_name='classificação', limit_choices_to={'cost_center': True})
-    # liquidated = models.BooleanField('pago?', default=False)
+    # person = models.ForeignKey('core.People', on_delete=models.CASCADE, null=True, blank=True,
+    #                            verbose_name='fornecedor', limit_choices_to={'supplier': True})
+    # classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
+    #                                           verbose_name='classificação', limit_choices_to={'cost_center': True})
+    # # liquidated = models.BooleanField('pago?', default=False)
+    objects = AccountPayableManager()
+
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.payment.value
+        super().__init__(*args, **kwargs)
 
     class Meta:
+        proxy = True
         verbose_name = 'pagamento'
 
 
-class AccountReceivables(Account):
-    person = models.ForeignKey('core.People', on_delete=models.PROTECT, null=True, blank=True,
-                               verbose_name='cliente', limit_choices_to={'customer': True})
-    classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
-                                              verbose_name='classificação', limit_choices_to={'revenue_center': True})
-    # liquidated = models.BooleanField('recebido?', default=False)
-    sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
-                                   verbose_name=SaleOrder._meta.verbose_name)
+@receiver(models.signals.post_delete, sender=AccountPayable)
+def account_payable_post_delete(sender, instance, *args, **kwargs):
+    _account_post_delete(instance)
 
-    def save(self, *args, **kwargs):
-        if self.sale_order:
-            if self.description in [None, '']:
-                self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
-            self.document_emission_date = self.sale_order.date
-            self.person = self.sale_order.customer
-            # self.save()
-        super(AccountReceivables, self).save(*args, **kwargs)
+
+class AccountReceivable(Account):
+    # person = models.ForeignKey('core.People', on_delete=models.PROTECT, null=True, blank=True,
+    #                            verbose_name='cliente', limit_choices_to={'customer': True})
+    # classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
+    #                                           verbose_name='classificação', limit_choices_to={'revenue_center': True})
+    # # liquidated = models.BooleanField('recebido?', default=False)
+    # sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
+    #                                verbose_name=SaleOrder._meta.verbose_name)
+    #
+    # def save(self, *args, **kwargs):
+    #     if self.sale_order:
+    #         if self.description in [None, '']:
+    #             self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
+    #         self.document_emission_date = self.sale_order.date
+    #         self.person = self.sale_order.customer
+    #         # self.save()
+    #     super(AccountReceivables, self).save(*args, **kwargs)
+    objects = AccountReceivableManager()
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.receivement.value
+        super().__init__(*args, **kwargs)
 
     class Meta:
+        proxy = True
         verbose_name = 'recebimento'
+
+
+@receiver(models.signals.post_delete, sender=AccountReceivable)
+def account_receivable_post_delete(sender, instance, *args, **kwargs):
+    _account_post_delete(instance)
+
+
+class FinancialMovement(Account):
+    objects = FinancialMovementManager()
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.payment.value
+        self._meta.get_field('liquidated').default = True
+        self._meta.get_field('financial_movement').default = True
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        proxy = True
+        verbose_name = 'movimento financeiro'
+        verbose_name_plural = 'movimentos financeiros'

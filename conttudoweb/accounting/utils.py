@@ -18,6 +18,15 @@ class AccountFrequencys(enum.Enum):
     annual = 'annual'
 
 
+class AccountPaymentReceivement(enum.Enum):
+    payment = 'p'
+    receivement = 'r'
+PAYMENT_RECEIVEMENT_CHOICES = [
+    (AccountPaymentReceivement.payment.value, 'Pagamento'),
+    (AccountPaymentReceivement.receivement.value, 'Recebimento'),
+]
+
+
 def get_due_date(due_date, frequency, parcel=None, day=None):
     if parcel == None:
         parcel = 1

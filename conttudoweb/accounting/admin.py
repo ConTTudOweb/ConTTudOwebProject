@@ -1,11 +1,13 @@
 from django import forms
 from django.contrib import admin, messages
+from django.contrib.admin import SimpleListFilter
 from django.http import HttpResponseRedirect
-from django.urls import reverse, path
+from django.urls import reverse, path, resolve
 from django.utils.html import format_html
 
-from .models import AccountReceivables, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
-    Recurrence, Account
+from conttudoweb.accounting.utils import AccountPaymentReceivement
+from .models import AccountReceivable, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
+    Recurrence, Account, FinancialMovement
 
 
 class AccountModelForm(forms.ModelForm):
@@ -18,17 +20,21 @@ class AccountPayableModelForm(AccountModelForm):
     class Meta:
         labels = {
             'expected_deposit_account': 'Pagar por',
+            'person': 'Fornecedor',
+            'classification_center': 'Centro de custo'
         }
 
 
-class AccountReceivablesModelForm(AccountModelForm):
+class AccountReceivableModelForm(AccountModelForm):
     class Meta:
         labels = {
             'expected_deposit_account': 'Receber por',
+            'person': 'Cliente',
+            'classification_center': 'Centro de receita'
         }
 
 
-class AccountModelAdmin:
+class AccountModelAdmin(admin.ModelAdmin):
     list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated')
     list_editable = ('liquidated',)
     search_fields = ('description',)
@@ -56,47 +62,47 @@ class AccountModelAdmin:
     # def get_queryset(self, request):
     #     return super().get_queryset(request).filter(entity=request.user.entity)
 
-    def title(self, obj):
-        return str(obj)
-    title.short_description = Account._meta.get_field('description').verbose_name
-    title.admin_order_field = 'description'
+    # def title(self, obj):
+    #     return str(obj)
+    # title.short_description = Account._meta.get_field('description').verbose_name
+    # title.admin_order_field = 'description'
 
-    def action(self, obj):
-        text = None
-        url_reverse = None
-        _reconcile = "Conciliar"
-        _reconciled = "Conciliado"
-
-        if self.__class__ == AccountPayableModelAdmin:
-            if not obj.liquidated:
-                text = "Pagar"
-                url_reverse = "admin:accounting_accountpayable_change"
-            elif not obj.reconciled:
-                text = _reconcile
-                url_reverse = "admin:accounting_accountpayable_change"
-            elif obj.reconciled:
-                text = _reconciled
-                url_reverse = "admin:accounting_accountpayable_change"
-        elif self.__class__ == AccountReceivablesModelAdmin:
-            if not obj.liquidated:
-                text = "Receber"
-                url_reverse = "admin:accounting_accountreceivables_change"
-            elif not obj.reconciled:
-                text = _reconcile
-                url_reverse = "admin:accounting_accountreceivables_change"
-            elif obj.reconciled:
-                text = _reconciled
-                url_reverse = "admin:accounting_accountreceivables_change"
-
-        if text is not None:
-            return format_html(
-                '<a class="button" href="{}">' + text + '</a>',
-                reverse(url_reverse, args=[obj.pk]),
-            )
-        else:
-            return ""
-    action.short_description = ''
-    action.allow_tags = True
+    # def action(self, obj):
+    #     text = None
+    #     url_reverse = None
+    #     _reconcile = "Conciliar"
+    #     _reconciled = "Conciliado"
+    #
+    #     if self.__class__ == AccountPayableModelAdmin:
+    #         if not obj.liquidated:
+    #             text = "Pagar"
+    #             url_reverse = "admin:accounting_accountpayable_change"
+    #         elif not obj.reconciled:
+    #             text = _reconcile
+    #             url_reverse = "admin:accounting_accountpayable_change"
+    #         elif obj.reconciled:
+    #             text = _reconciled
+    #             url_reverse = "admin:accounting_accountpayable_change"
+    #     elif self.__class__ == AccountReceivableModelAdmin:
+    #         if not obj.liquidated:
+    #             text = "Receber"
+    #             url_reverse = "admin:accounting_accountreceivable_change"
+    #         elif not obj.reconciled:
+    #             text = _reconcile
+    #             url_reverse = "admin:accounting_accountreceivable_change"
+    #         elif obj.reconciled:
+    #             text = _reconciled
+    #             url_reverse = "admin:accounting_accountreceivable_change"
+    #
+    #     if text is not None:
+    #         return format_html(
+    #             '<a class="button" href="{}">' + text + '</a>',
+    #             reverse(url_reverse, args=[obj.pk]),
+    #         )
+    #     else:
+    #         return ""
+    # action.short_description = ''
+    # action.allow_tags = True
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if request.method == 'POST':
@@ -120,26 +126,109 @@ class AccountModelAdmin:
 
     def has_change_permission(self, request, obj=None):
         if obj:
-            return not obj.liquidated
+            return super().has_change_permission(request, obj) and (not obj.liquidated)
         else:
             return super().has_change_permission(request, obj)
 
 
-@admin.register(Recurrence)
-class RecurrenceModelAdmin(admin.ModelAdmin):
-    pass
+# @admin.register(Recurrence)
+# class RecurrenceModelAdmin(admin.ModelAdmin):
+#     pass
 
 
 @admin.register(AccountPayable)
-class AccountPayableModelAdmin(AccountModelAdmin, admin.ModelAdmin):
+class AccountPayableModelAdmin(AccountModelAdmin):
     form = AccountPayableModelForm
     change_form_template = 'change_form_accountPayable.html'
 
 
-@admin.register(AccountReceivables)
-class AccountReceivablesModelAdmin(AccountModelAdmin, admin.ModelAdmin):
-    form = AccountReceivablesModelForm
-    change_form_template = 'change_form_accountReceivables.html'
+@admin.register(AccountReceivable)
+class AccountReceivableModelAdmin(AccountModelAdmin):
+    form = AccountReceivableModelForm
+    change_form_template = 'change_form_accountReceivable.html'
+
+
+class FinancialMovementModelForm(AccountModelForm):
+    class Meta:
+        labels = {
+            'liquidated_date': 'Data do movimento'
+        }
+
+
+@admin.register(FinancialMovement)
+class FinancialMovementModelAdmin(admin.ModelAdmin):
+    class ExpectedDepositAccountFilter(SimpleListFilter):
+        title = DepositAccount._meta.verbose_name
+        parameter_name = 'expected_deposit_account'
+
+        def lookups(self, _, model_admin):
+            return [(deposit_account.id, str(deposit_account)) for deposit_account in DepositAccount.objects.all()]
+
+        def queryset(self, request, queryset):
+            if self.value():
+                return queryset.filter(expected_deposit_account__id__exact=self.value())
+            else:
+                messages.add_message(request, messages.WARNING, 'Escolha uma ' + self.title)
+                return queryset.filter(expected_deposit_account__id__exact=0)
+
+    list_display = ('liquidated_date', 'title', 'person', 'amount_converted')
+    list_filter = (ExpectedDepositAccountFilter,)
+    search_fields = ('description',)
+    date_hierarchy = 'liquidated_date'
+    ordering = ('-liquidated_date',)
+    actions_on_top = False
+    actions_on_bottom = True
+
+    autocomplete_fields = ('category',)
+    raw_id_fields = ('person',)  # TODO: autocomplete_fields não está funcionando com limit_choices_to
+    fieldsets = (
+        (None, {
+            'fields': (
+                'payment_receivement',
+                ('description', 'liquidated_date', 'amount'),
+                ('category', 'document_emission_date', 'expected_deposit_account'),
+                ('person', 'classification_center', 'document'),
+                'observation'
+            )
+        }),
+    )
+    radio_fields = {"payment_receivement": admin.HORIZONTAL}
+    # readonly_fields = ('expected_deposit_account',)
+
+    form = FinancialMovementModelForm
+    change_list_template = 'change_list_financial_movement.html'
+
+    def has_add_permission(self, request):
+        if resolve(request.path_info).url_name == 'accounting_financialmovement_changelist':
+            return request.GET.get('expected_deposit_account', None) and super().has_add_permission(request)
+        elif resolve(request.path_info).url_name == 'accounting_financialmovement_add':
+            return request.session.get('expected_deposit_account', None) and super().has_add_permission(request)
+
+    def changelist_view(self, request, extra_context=None):
+        expected_deposit_account = request.GET.get('expected_deposit_account', None)
+        if expected_deposit_account is not None:
+            deposit_account = DepositAccount.objects.get(id=expected_deposit_account)
+            extra_context = {'deposit_account': deposit_account, **(extra_context or {})}
+            request.session['expected_deposit_account'] = expected_deposit_account
+        return super().changelist_view(request, extra_context)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'expected_deposit_account':
+            kwargs['initial'] = request.session.get('expected_deposit_account', None)
+            kwargs['disabled'] = True
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        initial = {
+            'expected_deposit_account': request.session.get('expected_deposit_account', None),
+            'payment_receivement': AccountPaymentReceivement.payment.value,
+            **initial
+        }
+        return initial
+
+    class Media:
+        js = ('js/financial-movement-admin.js',)
 
 
 @admin.register(Bank)
