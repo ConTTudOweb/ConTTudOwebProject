@@ -40,6 +40,10 @@ class AccountReceivableInline(admin.TabularInline):
     #     return _readonly_fields
 
 
+# TODO: Criar travas no pedido para impedir a alteração após o fechamento do mesmo.
+# TODO: Criar travas no receber do pedido para impedir o lançamento acima do valor do pedido.
+# TODO: Criar impressão do pedido.
+# TODO: Ao lançar o produto sugerir o preço de venda do mesmo.
 @admin.register(SaleOrder)
 class SaleOrderModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'customer', 'code', 'date']

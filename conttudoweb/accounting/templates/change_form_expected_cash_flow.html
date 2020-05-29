@@ -1,0 +1,40 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <form action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}
+        <div>
+            {% if form.errors %}
+                <p class="errornote">
+                {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+                </p>
+                {{ form.non_field_errors }}
+            {% endif %}
+            <fieldset class="module aligned">
+
+                <div class="form-row field-expected_deposit_account">
+                    <div class="fieldBox field-expected_deposit_account">
+                        {{ form.expected_deposit_account.errors }}
+                        {{ form.expected_deposit_account.label_tag }}
+                        {{ form.expected_deposit_account }}
+                    </div>
+                    <div class="fieldBox field-start_date">
+                        {{ form.start_date.errors }}
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date }}
+                    </div>
+                    <div class="fieldBox field-end_date">
+                        {{ form.end_date.errors }}
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date }}
+                    </div>
+                </div>
+            </fieldset>
+            <div class="submit-row">
+                <input type="submit" value="Pesquisar" class="default" name="_pesquisar">
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

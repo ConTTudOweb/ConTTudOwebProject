@@ -12,3 +12,25 @@ span.account-saldo {
 span.account-saldo-negativo {
     color: darkred;
 }
+
+/*
+expected_cash_flow
+*/
+
+.expected_cash_flow {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.expected_cash_flow table {
+    width: 100%;
+}
+
+.expected_cash_flow table tr.balance {
+    font-weight: bold;
+}
+
+.expected_cash_flow table th.title-value,
+.expected_cash_flow table td.value {
+    text-align: right;
+}
