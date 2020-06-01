@@ -2,10 +2,9 @@ import enum
 from copy import deepcopy
 
 from dateutil.relativedelta import relativedelta
-from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.timezone import now
@@ -45,8 +44,6 @@ class DepositAccount(models.Model):
         money = 'mon'
         investment = 'inv'
 
-    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
-
     type = models.CharField('tipo', max_length=3, default=DepositAccountTypes.current_account.value, choices=[
         (DepositAccountTypes.current_account.value, 'Conta corrente'),
         (DepositAccountTypes.money.value, 'Dinheiro'),
@@ -63,22 +60,14 @@ class DepositAccount(models.Model):
     name = models.CharField('nome da conta', max_length=30)
 
     def balance(self):
-        balance = Decimal(0)
-        query = Account.objects.filter(
-            expected_deposit_account=self, liquidated=True
-        ).aggregate(
-            received=Sum('amount', filter=Q(payment_receivement=AccountPaymentReceivement.receivement.value)),
-            paid=Sum('amount', only=Q(payment_receivement=AccountPaymentReceivement.payment.value))
-        )
-        if query['received']:
-            balance += query['received']
-        if query['paid']:
-            balance -= query['paid']
-        return balance
-    balance.short_description = 'saldo'
+        qs = FinancialMovement.objects.filter(
+            expected_deposit_account=self
+        ).aggregate(balance=Sum('amount_with_sign'))
+
+        return qs['balance']
 
     def __str__(self):
-        return self.name
+        return str(self.account_set.count())
 
     def clean(self):
         # Quanto o tipo for "Conta corrente" deve obrigar a preencher o banco.
@@ -170,6 +159,8 @@ class Account(models.Model):
         (AccountTypes.recurrent.value, 'Recorrente'),
     ]
 
+    amount_label = 'valor'
+
     # class AccountPaymentReceivement(enum.Enum):
     #     payment = 'p'
     #     receivement = 'r'
@@ -181,7 +172,7 @@ class Account(models.Model):
     # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
-    amount = models.DecimalField('valor', max_digits=15, decimal_places=2)
+    amount = models.DecimalField(amount_label, max_digits=15, decimal_places=2)
     due_date = models.DateField('data de vencimento', null=True, blank=False)
     recurrence_key = models.ForeignKey('Recurrence', on_delete=models.PROTECT, null=True, blank=True, editable=False)
     recurrence_count = models.IntegerField(null=True, blank=True, editable=False)
@@ -232,11 +223,6 @@ class Account(models.Model):
         return str(self)
     title.short_description = 'descrição'
     title.admin_order_field = 'description'
-
-    def amount_converted(self):
-        if self.payment_receivement == AccountPaymentReceivement.payment.value:
-            return self.amount*-1
-        return self.amount
 
     def __str__(self):
         if self.type == self.AccountTypes.parcelled.value:

@@ -1,3 +1,28 @@
+:root {
+  --negative-value-color: darkred;
+}
+
+/*
+Fields in grid list
+*/
+
+/* accounting/financialmovement/ */
+#result_list th.column-amount_with_sign, #result_list td.field-amount_with_sign,
+/* accounting/depositaccount/ */
+#result_list th.column-balance, #result_list td.field-balance {
+    text-align: right;
+}
+
+span.positive-value {
+    color: darkgreen;
+}
+
+span.negative-value {
+    color: var(--negative-value-color);
+}
+
+/*************/
+
 span.account-saldo-title {
     font-size: large
 }
@@ -6,11 +31,6 @@ span.account-saldo {
     font-size: x-large;
     font-weight: bold;
     padding-left: 20px;
-    color: darkgreen;
-}
-
-span.account-saldo-negativo {
-    color: darkred;
 }
 
 /*

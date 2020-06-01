@@ -4,7 +4,7 @@
     <div class="xfull" style="text-align: right;">
         <h1><strong>{{ deposit_account }}</strong></h1>
         <span class="account-saldo-title">Saldo</span>
-        <span class="account-saldo {% if deposit_account.balance < 0 %}account-saldo-negativo{% endif %}">
+        <span class="account-saldo {% if deposit_account.balance < 0 %}negative-value{% else %}positive-value{% endif %}">
             R$ {{ deposit_account.balance }}
         </span>
     </div>

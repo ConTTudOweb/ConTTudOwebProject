@@ -26,6 +26,7 @@ from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
+admin.site.empty_value_display = '---'
 
 router = routers.DefaultRouter(trailing_slash=True)
 router.register('federative-unit', FederativeUnitViewSet)

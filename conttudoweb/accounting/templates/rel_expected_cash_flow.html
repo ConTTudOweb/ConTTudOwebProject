@@ -6,12 +6,11 @@
         <p class="deletelink-box">
             <label>Gerado em:</label> {% now "SHORT_DATETIME_FORMAT" %}<br/>
             <label>Considerando saldo das contas:</label> {{ form.selected_expected_deposit_account_labels }}<br/>
-            {{ form.start_date.label_tag }} {{ form.start_date.value|default_if_none:"---" }}<label> | </label>{{ form.end_date.label_tag }} {{ form.end_date.value|default_if_none:"---" }}
+            {{ form.start_date.label_tag }} {{ form.start_date.value|default_if_none:empty_value_display }}<label> | </label>{{ form.end_date.label_tag }} {{ form.end_date.value|default_if_none:empty_value_display }}
         </p>
         <a href="{% url opts|admin_urlname:'changelist' %}" class="closelink">Fechar</a>
     </div>
     <div id="content-main" class="expected_cash_flow">
-        {% with '---' as empty_str %}
         <table>
             <thead>
                 <tr class="balance">
@@ -32,14 +31,13 @@
                 <tr>
                     <td>{{ q.due_date|date:"SHORT_DATE_FORMAT" }}</td>
                     <td>{{ q }}</td>
-                    <td>{{ q.expected_deposit_account|default_if_none:empty_str }}</td>
-                    <td class="value">{% if q.payment_receivement == 'p' %}{{ q.amount }}{% else %}{{ empty_str }}{% endif %}</td>
-                    <td class="value">{% if q.payment_receivement == 'r' %}{{ q.amount }}{% else %}{{ empty_str }}{% endif %}</td>
+                    <td>{{ q.expected_deposit_account|default_if_none:empty_value_display }}</td>
+                    <td class="value">{% if q.payment_receivement == 'p' %}{{ q.amount }}{% else %}{{ empty_value_display }}{% endif %}</td>
+                    <td class="value">{% if q.payment_receivement == 'r' %}{{ q.amount }}{% else %}{{ empty_value_display }}{% endif %}</td>
                     <td class="value">{{ q.cumulative_amount }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% endwith %}
     </div>
 {% endblock %}

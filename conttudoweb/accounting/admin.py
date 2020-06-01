@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
@@ -6,6 +7,7 @@ from django.db.models import Q, Sum, Window, F, Case, When, DecimalField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import resolve
+from django.utils.html import format_html
 
 from conttudoweb.accounting.utils import AccountPaymentReceivement
 from .models import AccountReceivable, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
@@ -175,7 +177,7 @@ class FinancialMovementModelAdmin(admin.ModelAdmin):
                 messages.add_message(request, messages.WARNING, 'Escolha uma ' + self.title)
                 return queryset.filter(expected_deposit_account__id__exact=0)
 
-    list_display = ('liquidated_date', 'title', 'person', 'amount_converted')
+    list_display = ('liquidated_date', 'title', 'person', 'amount_with_sign')
     list_filter = (ExpectedDepositAccountFilter,)
     search_fields = ('description',)
     date_hierarchy = 'liquidated_date'
@@ -197,10 +199,20 @@ class FinancialMovementModelAdmin(admin.ModelAdmin):
         }),
     )
     radio_fields = {"payment_receivement": admin.HORIZONTAL}
-    # readonly_fields = ('expected_deposit_account',)
 
     form = FinancialMovementModelForm
     change_list_template = 'change_list_financial_movement.html'
+
+    def amount_with_sign(self, obj):
+        _css_class = 'positive-value'
+        if obj.amount_with_sign < 0:
+            _css_class = 'negative-value'
+        return format_html(
+            '<span class="{}">{}</span>', _css_class, obj.amount_with_sign
+        )
+    amount_with_sign.admin_order_field = 'amount_with_sign'
+    amount_with_sign.short_description = Account.amount_label
+    amount_with_sign.allow_tags = True
 
     def has_add_permission(self, request):
         if resolve(request.path_info).url_name == 'accounting_financialmovement_changelist':
@@ -285,17 +297,8 @@ class DepositAccountModelAdmin(admin.ModelAdmin):
     )
     form = DepositAccountModelForm
 
-    # def save_model(self, request, obj, form, change):
-    #     obj.entity = request.user.entity
-    #     super().save_model(request, obj, form, change)
-
-    # def get_queryset(self, request):
-    #     return super().get_queryset(request).filter(entity=request.user.entity)
-
-
-# @admin.register(ExpectedCashFlow)
-# class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
-#     pass
+    def balance(self, obj):
+        return obj.balance()
 
 
 class CustomForm(forms.Form):
@@ -323,9 +326,9 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
         return False
 
     def changelist_view(self, request, extra_context=None):
-        print(self.get_preserved_filters(request))
         context = {'title': self.model._meta.verbose_name_plural,
-                   'opts': ExpectedCashFlow._meta}
+                   'opts': ExpectedCashFlow._meta,
+                   'empty_value_display': self.admin_site.empty_value_display}
         if request.method == 'POST':
             form = CustomForm(request.POST)
             if form.is_valid():
