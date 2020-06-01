@@ -67,7 +67,7 @@ class DepositAccount(models.Model):
         return qs['balance']
 
     def __str__(self):
-        return str(self.account_set.count())
+        return str(self.name)
 
     def clean(self):
         # Quanto o tipo for "Conta corrente" deve obrigar a preencher o banco.
