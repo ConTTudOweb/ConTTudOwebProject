@@ -7,6 +7,7 @@ from .forms import MyUserChangeForm, MyUserCreationForm
 from .models import MyUser
 
 
+# TODO: Precisa criar um esquema que crie o usuário com senha aleatória e solicite a troca no primeiro acesso.
 @admin.register(MyUser)
 class MyUserAdmin(BaseUserAdmin):
     # The forms to add and change user instances

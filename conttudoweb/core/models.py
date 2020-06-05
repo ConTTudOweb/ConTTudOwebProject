@@ -4,17 +4,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-# class Entity(models.Model):
-#     name = models.CharField('nome', max_length=30, unique=True,
-#                             help_text='Algo como "Controle Pessoal" ou "Nome da Minha empresa".')
-#
-#     def __str__(self):
-#         return self.name
-#
-#     class Meta:
-#         verbose_name = 'entidade'
-
-
 class FederativeUnit(models.Model):
     initials = models.CharField('sigla', max_length=2, unique=True)
     name = models.CharField('nome', max_length=255)
@@ -40,6 +29,8 @@ class City(models.Model):
         ordering = ('name',)
 
 
+# TODO: Colocar validação no cpf e maskara no telefone
+# TODO: Após preencher o cep carregar o endereço
 class People(models.Model):
     supplier_label = 'fornecedor'
     supplier_verbose_name = '%s?' % supplier_label
@@ -50,11 +41,10 @@ class People(models.Model):
         natural_person = 'F'
         juridical_person = 'J'
 
-    # entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     customer = models.BooleanField(customer_verbose_name, default=False)
     supplier = models.BooleanField(supplier_verbose_name, default=False)
     name = models.CharField('nome', max_length=60, unique=True)
-    person_type = models.CharField('tipo', max_length=1, null=True, blank=True, choices=[
+    person_type = models.CharField('tipo', max_length=1, null=True, blank=False, choices=[
         (PersonTypes.natural_person.value, 'Pessoa Física'),
         (PersonTypes.juridical_person.value, 'Pessoa Jurídica')
     ])
@@ -79,6 +69,10 @@ class People(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field('person_type').default = self.PersonTypes.natural_person.value
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         # Ao menos uma das opções deve ser escolhida! "cliente" ou "fornecedor"

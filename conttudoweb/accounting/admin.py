@@ -2,7 +2,8 @@ from decimal import Decimal
 
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin import SimpleListFilter
+from django.contrib.admin import SimpleListFilter, widgets
+from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum, Window, F, Case, When, DecimalField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -42,9 +43,7 @@ class AccountModelAdmin(admin.ModelAdmin):
     list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated')
     list_editable = ('liquidated',)
     search_fields = ('description',)
-    # exclude = ('entity',)
-    autocomplete_fields = ('category',)
-    raw_id_fields = ('person',)  # TODO: autocomplete_fields não está funcionando com limit_choices_to
+    autocomplete_fields = ('category', 'person')
     fieldsets = (
         (None, {
             'fields': (
@@ -59,64 +58,13 @@ class AccountModelAdmin(admin.ModelAdmin):
     radio_fields = {"type": admin.HORIZONTAL}
     ordering = ['due_date']
 
-    # def save_model(self, request, obj, form, change):
-    #     obj.entity = request.user.entity
-    #     super().save_model(request, obj, form, change)
-
-    # def get_queryset(self, request):
-    #     return super().get_queryset(request).filter(entity=request.user.entity)
-
-    # def title(self, obj):
-    #     return str(obj)
-    # title.short_description = Account._meta.get_field('description').verbose_name
-    # title.admin_order_field = 'description'
-
-    # def action(self, obj):
-    #     text = None
-    #     url_reverse = None
-    #     _reconcile = "Conciliar"
-    #     _reconciled = "Conciliado"
-    #
-    #     if self.__class__ == AccountPayableModelAdmin:
-    #         if not obj.liquidated:
-    #             text = "Pagar"
-    #             url_reverse = "admin:accounting_accountpayable_change"
-    #         elif not obj.reconciled:
-    #             text = _reconcile
-    #             url_reverse = "admin:accounting_accountpayable_change"
-    #         elif obj.reconciled:
-    #             text = _reconciled
-    #             url_reverse = "admin:accounting_accountpayable_change"
-    #     elif self.__class__ == AccountReceivableModelAdmin:
-    #         if not obj.liquidated:
-    #             text = "Receber"
-    #             url_reverse = "admin:accounting_accountreceivable_change"
-    #         elif not obj.reconciled:
-    #             text = _reconcile
-    #             url_reverse = "admin:accounting_accountreceivable_change"
-    #         elif obj.reconciled:
-    #             text = _reconciled
-    #             url_reverse = "admin:accounting_accountreceivable_change"
-    #
-    #     if text is not None:
-    #         return format_html(
-    #             '<a class="button" href="{}">' + text + '</a>',
-    #             reverse(url_reverse, args=[obj.pk]),
-    #         )
-    #     else:
-    #         return ""
-    # action.short_description = ''
-    # action.allow_tags = True
-
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if request.method == 'POST':
             # TODO: Ao liquidar um título exigir que o mesmo tenha a conta financeira informada.
             if '_process' in request.POST:
-                # super().change_view(request, object_id, form_url, extra_context)
                 obj = self.model.objects.get(pk=object_id)
                 obj.liquidated = not obj.liquidated
                 obj.save()
-
                 if obj.liquidated:
                     msg = "Baixa efetuada '{}'."
                 else:
@@ -326,9 +274,11 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
         return False
 
     def changelist_view(self, request, extra_context=None):
-        context = {'title': self.model._meta.verbose_name_plural,
-                   'opts': ExpectedCashFlow._meta,
-                   'empty_value_display': self.admin_site.empty_value_display}
+        context = {
+            'title': self.model._meta.verbose_name_plural,
+            'opts': ExpectedCashFlow._meta,
+            'empty_value_display': self.admin_site.empty_value_display
+        }
         if request.method == 'POST':
             form = CustomForm(request.POST)
             if form.is_valid():

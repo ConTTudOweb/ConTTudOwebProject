@@ -2,6 +2,7 @@ import enum
 from copy import deepcopy
 
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
@@ -12,7 +13,7 @@ from django.utils.timezone import now
 from conttudoweb.accounting.managers import AccountReceivableManager, AccountPayableManager, FinancialMovementManager
 from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence, \
     PAYMENT_RECEIVEMENT_CHOICES, AccountPaymentReceivement
-from conttudoweb.sale.models import SaleOrder
+from conttudoweb.core import utils
 
 
 class Category(models.Model):
@@ -38,6 +39,7 @@ class Bank(models.Model):
         ordering = ('code',)
 
 
+# TODO: Implementar saldo inicial
 class DepositAccount(models.Model):
     class DepositAccountTypes(enum.Enum):
         current_account = 'cur'
@@ -60,11 +62,14 @@ class DepositAccount(models.Model):
     name = models.CharField('nome da conta', max_length=30)
 
     def balance(self):
+        balance = Decimal(0)
         qs = FinancialMovement.objects.filter(
             expected_deposit_account=self
         ).aggregate(balance=Sum('amount_with_sign'))
+        if qs['balance']:
+            balance = qs['balance']
 
-        return qs['balance']
+        return balance
 
     def __str__(self):
         return str(self.name)
@@ -161,15 +166,6 @@ class Account(models.Model):
 
     amount_label = 'valor'
 
-    # class AccountPaymentReceivement(enum.Enum):
-    #     payment = 'p'
-    #     receivement = 'r'
-    # PAYMENT_RECEIVEMENT_CHOICES = [
-    #     (AccountPaymentReceivement.payment.value, 'Pagamento'),
-    #     (AccountPaymentReceivement.receivement.value, 'Recebimento'),
-    # ]
-
-    # entity = models.ForeignKey('core.Entity', on_delete=models.CASCADE)
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
     amount = models.DecimalField(amount_label, max_digits=15, decimal_places=2)
@@ -215,7 +211,7 @@ class Account(models.Model):
                                               verbose_name='centro de receita/custo')
     financial_movement = models.BooleanField(default=False)
     sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
-                                   verbose_name=SaleOrder._meta.verbose_name)
+                                   verbose_name=utils.sale_order_verbose_name)
 
     __original_description = None
 
@@ -314,13 +310,7 @@ def _account_post_delete(instance):
 
 
 class AccountPayable(Account):
-    # person = models.ForeignKey('core.People', on_delete=models.CASCADE, null=True, blank=True,
-    #                            verbose_name='fornecedor', limit_choices_to={'supplier': True})
-    # classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
-    #                                           verbose_name='classificação', limit_choices_to={'cost_center': True})
-    # # liquidated = models.BooleanField('pago?', default=False)
     objects = AccountPayableManager()
-
 
     def __init__(self, *args, **kwargs):
         self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.payment.value
@@ -337,22 +327,6 @@ def account_payable_post_delete(sender, instance, *args, **kwargs):
 
 
 class AccountReceivable(Account):
-    # person = models.ForeignKey('core.People', on_delete=models.PROTECT, null=True, blank=True,
-    #                            verbose_name='cliente', limit_choices_to={'customer': True})
-    # classification_center = models.ForeignKey('ClassificationCenter', on_delete=models.CASCADE, null=True, blank=True,
-    #                                           verbose_name='classificação', limit_choices_to={'revenue_center': True})
-    # # liquidated = models.BooleanField('recebido?', default=False)
-    # sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
-    #                                verbose_name=SaleOrder._meta.verbose_name)
-    #
-    # def save(self, *args, **kwargs):
-    #     if self.sale_order:
-    #         if self.description in [None, '']:
-    #             self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
-    #         self.document_emission_date = self.sale_order.date
-    #         self.person = self.sale_order.customer
-    #         # self.save()
-    #     super(AccountReceivables, self).save(*args, **kwargs)
     objects = AccountReceivableManager()
 
     def __init__(self, *args, **kwargs):

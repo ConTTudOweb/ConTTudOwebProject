@@ -4,12 +4,6 @@ from conttudoweb.core.forms import PeopleForm
 from .models import People, City, FederativeUnit
 
 
-# @admin.register(Entity)
-# class EntityModelAdmin(admin.ModelAdmin):
-#     list_display = ('name',)
-#     search_fields = ('name',)
-
-
 @admin.register(FederativeUnit)
 class FederativeUnitModelAdmin(admin.ModelAdmin):
     list_display = ('initials', 'name')
@@ -29,7 +23,6 @@ class PeopleModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'observation')
     search_fields = ('name', 'observation')
     ordering = ['name']
-    # exclude = ('entity',)
     list_filter = ('customer', 'supplier')
     autocomplete_fields = ('city',)
     radio_fields = {'person_type': admin.HORIZONTAL}
@@ -48,15 +41,11 @@ class PeopleModelAdmin(admin.ModelAdmin):
     )
     form = PeopleForm
 
-    # def save_model(self, request, obj, form, change):
-    #     obj.entity = request.user.entity
-    #     super().save_model(request, obj, form, change)
-
-    # def get_queryset(self, request):
-    #     return super().get_queryset(request).filter(entity=request.user.entity)
-
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
         if 'autocomplete' in request.path:
-            queryset = queryset.filter(supplier=True)
+            if 'accountpayable' in request.META.get('HTTP_REFERER', ''):
+                queryset = queryset.filter(supplier=True)
+            elif 'accountreceivable' in request.META.get('HTTP_REFERER', ''):
+                queryset = queryset.filter(customer=True)
         return queryset, use_distinct

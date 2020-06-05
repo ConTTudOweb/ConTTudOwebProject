@@ -1,7 +1,7 @@
 from django.db import models
 
+from conttudoweb.core import utils
 from conttudoweb.core.models import People
-from conttudoweb.core.utils import format_currency
 from conttudoweb.inventory.models import Product
 
 
@@ -16,7 +16,7 @@ class SaleOrder(models.Model):
         net_total = 0
         for i in self.saleorderitems_set.all():
             net_total += i._net_total()
-        return format_currency(net_total)
+        return utils.format_currency(net_total)
     amount_admin.short_description = 'valor líquido'
     amount = property(amount_admin)
 
@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
         return "#%s - %s" % (self.id, self.date)
 
     class Meta:
-        verbose_name = 'pedido de venda'
+        verbose_name = utils.sale_order_verbose_name
         verbose_name_plural = 'pedidos de venda'
 
 
@@ -46,7 +46,7 @@ class SaleOrderItems(models.Model):
 
     def amount_admin(self):
         if self._net_total():
-            return format_currency(self._net_total())
+            return utils.format_currency(self._net_total())
         return ""
     amount_admin.short_description = 'valor líquido'
     amount = property(amount_admin)

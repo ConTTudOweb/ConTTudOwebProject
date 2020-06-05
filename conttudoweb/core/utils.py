@@ -9,3 +9,9 @@ def format_currency(value):
     if value:
         value = f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     return value
+
+
+# String models
+
+# sale
+sale_order_verbose_name = 'pedido de venda'
