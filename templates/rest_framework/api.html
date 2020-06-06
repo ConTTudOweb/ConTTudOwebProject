@@ -1,0 +1,7 @@
+{% extends "rest_framework/base.html" %}
+
+{% block title %}{% if name %}{{ name }} – {% endif %}{{ EMPRESA.name }}{% endblock %}
+
+{% block branding %}
+    <a class='navbar-brand'>{{ EMPRESA.name }}</a>
+{% endblock %}

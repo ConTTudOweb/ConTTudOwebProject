@@ -24,6 +24,9 @@ django-cors-headers = "*"
 djangorestframework = "*"
 django-rest-auth = "*"
 django-filter = "*"
+pyyaml = "*"
+coreapi = "*"
+markdown = "*"
 
 [dev-packages]
 

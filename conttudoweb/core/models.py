@@ -3,6 +3,8 @@ import enum
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from conttudoweb.core.utils import federative_unit_verbose_name
+
 
 class FederativeUnit(models.Model):
     initials = models.CharField('sigla', max_length=2, unique=True)
@@ -12,7 +14,7 @@ class FederativeUnit(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'unidade federativa'
+        verbose_name = federative_unit_verbose_name
         ordering = ('name',)
 
 

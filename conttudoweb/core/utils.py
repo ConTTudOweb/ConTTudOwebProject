@@ -13,5 +13,8 @@ def format_currency(value):
 
 # String models
 
+# core
+federative_unit_verbose_name = 'unidade federativa'
+
 # sale
 sale_order_verbose_name = 'pedido de venda'

@@ -18,8 +18,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import path, include
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
+from rest_framework.routers import APIRootView
+from rest_framework.schemas import get_schema_view
 
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 
@@ -28,7 +30,20 @@ admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.index_title = settings.ADMIN_INDEX_TITLE
 admin.site.empty_value_display = '---'
 
-router = routers.DefaultRouter(trailing_slash=True)
+
+class API(routers.APIRootView):
+    """
+    Para mais detalhes visite a [documentação][doc].
+
+    [doc]:../api-doc
+    """
+
+
+class Router(routers.DefaultRouter):
+    APIRootView = API
+
+
+router = Router(trailing_slash=True)
 router.register('federative-unit', FederativeUnitViewSet)
 router.register('city', CityViewSet)
 router.register('people', PeopleViewSet)
@@ -38,6 +53,17 @@ urlpatterns = [path('', admin.site.urls),
                path('api/', include(router.urls)),
                path('api-auth/', include('rest_framework.urls')),
                path('rest-auth/', include('rest_auth.urls')),
+
+               path('openapi', get_schema_view(
+                   title="Documentação da API",
+                   description=settings.ADMIN_SITE_HEADER,
+                   version="1.0.0"
+               ), name='openapi-schema'),
+
+               path('api-doc/', TemplateView.as_view(
+                   template_name='swagger-ui.html',
+                   extra_context={'schema_url': 'openapi-schema'}
+               ), name='swagger-ui'),
 
                path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('assets/img/favicon.png')))
                ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
