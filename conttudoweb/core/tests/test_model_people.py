@@ -1,13 +1,10 @@
 from django.db import IntegrityError
 from django.test import TestCase
+from django_tenants.test.cases import FastTenantTestCase
 
-# from conttudoweb.core.tests.test_model_entity import get_or_create_entity
-from tenant_schemas.test.cases import FastTenantTestCase
-
-from ..models import People
-from ..admin import PeopleModelAdmin
 from .test_model import ModelAdminTest
-
+from ..admin import PeopleModelAdmin
+from ..models import People
 
 _name = 'People 1'
 _name_customer = 'Customer 1'
@@ -16,7 +13,6 @@ _name_supplier = 'Supplier 1'
 
 def create_people(**kwargs):
     people = People.objects.create(
-        # entity=get_or_create_entity(),
         **kwargs
     )
     return people

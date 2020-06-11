@@ -1,11 +1,10 @@
 from django.db import IntegrityError
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
 from ..admin import BankModelAdmin
-from ...core.tests.test_model import ModelAdminTest
 from ..models import Bank
-
+from ...core.tests.test_model import ModelAdminTest
 
 _code = 'XXX'
 _description = 'Bank 1'

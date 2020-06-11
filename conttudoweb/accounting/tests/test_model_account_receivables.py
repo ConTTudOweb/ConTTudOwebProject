@@ -1,10 +1,10 @@
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
-from ...core.tests.test_model import ModelAdminTest
-from ..models import AccountReceivable
-from ..admin import AccountReceivableModelAdmin
 from .test_model_account import create_account, AccountAdminTest
+from ..admin import AccountReceivableModelAdmin
+from ..models import AccountReceivable
+from ...core.tests.test_model import ModelAdminTest
 
 
 class AccountReceivablesModelTest(FastTenantTestCase):

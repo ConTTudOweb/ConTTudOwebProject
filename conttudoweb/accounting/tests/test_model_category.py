@@ -1,9 +1,9 @@
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
 from ..admin import CategoryModelAdmin
-from ...core.tests.test_model import ModelAdminTest
 from ...accounting.models import Category
+from ...core.tests.test_model import ModelAdminTest
 
 
 class CategoryModelTest(FastTenantTestCase):

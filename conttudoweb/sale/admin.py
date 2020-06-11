@@ -1,8 +1,14 @@
+from django import forms
 from django.contrib import admin
 
 from conttudoweb.accounting.admin import AccountReceivableModelForm
 from conttudoweb.accounting.models import AccountReceivable, Account
-from conttudoweb.sale.models import SaleOrder, SaleOrderItems
+from conttudoweb.sale.models import SaleOrder, SaleOrderItems, Vendor
+
+
+@admin.register(Vendor)
+class VendorModelAdmin(admin.ModelAdmin):
+    pass
 
 
 class SaleOrderItemsInline(admin.TabularInline):
@@ -12,7 +18,6 @@ class SaleOrderItemsInline(admin.TabularInline):
     readonly_fields = ('amount',)
 
 
-from django import forms
 class AccountReceivableSaleOrderModelForm(AccountReceivableModelForm):
     type = forms.ChoiceField(choices=AccountReceivable.TYPE_CHOICES_INLINES)
 

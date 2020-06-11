@@ -1,11 +1,11 @@
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
 from conttudoweb.accounting.utils import AccountFrequencys
-from ...core.tests.test_model import ModelAdminTest
-from ..models import Account, AccountPayable
-from ..admin import AccountPayableModelAdmin
 from .test_model_account import create_account, AccountAdminTest
+from ..admin import AccountPayableModelAdmin
+from ..models import Account, AccountPayable
+from ...core.tests.test_model import ModelAdminTest
 
 
 class AccountPayableModelTest(FastTenantTestCase):

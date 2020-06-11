@@ -54,7 +54,7 @@ class ProductBySupplierInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ['description', 'unit_of_measure', 'ncm', 'subcategory', 'last_cost_price']
+    list_display = ['id', 'description', 'unit_of_measure', 'ncm', 'subcategory', 'last_cost_price']
     search_fields = ['code', 'description', 'ncm', 'productbysupplier__description']
     inlines = [ProductBySupplierInline]
     autocomplete_fields = ['subcategory']

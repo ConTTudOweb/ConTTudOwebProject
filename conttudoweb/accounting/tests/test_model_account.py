@@ -1,13 +1,10 @@
-from django.test import TestCase
 import datetime
 
 from ..models import Account
-# from ...core.tests.test_model_entity import get_or_create_entity
 
 
 def create_account(_description, **kwargs):
     account = {
-        # 'entity': get_or_create_entity(),
         'document': None,
         'description': _description,
         'amount': 0.01,

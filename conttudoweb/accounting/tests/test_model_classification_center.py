@@ -1,11 +1,10 @@
 from django.db import IntegrityError
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
 from ..admin import ClassificationCenterModelAdmin
 from ..models import ClassificationCenter
 from ...core.tests.test_model import ModelAdminTest
-# from ...core.tests.test_model_entity import get_or_create_entity
 
 _name = 'Classification Center 1'
 _name_cost = 'Cost Center 1'
@@ -14,7 +13,6 @@ _name_revenue = 'Revenue Center 1'
 
 def create_classification_center(**kwargs):
     classification_center = ClassificationCenter.objects.create(
-        # entity=get_or_create_entity(),
         **kwargs
     )
     return classification_center

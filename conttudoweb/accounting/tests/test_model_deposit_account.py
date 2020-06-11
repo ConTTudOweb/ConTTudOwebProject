@@ -1,8 +1,8 @@
 from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
-from ..models import DepositAccount
 from ..admin import DepositAccountModelAdmin
+from ..models import DepositAccount
 from ...core.tests.test_model import ModelAdminTest
 
 

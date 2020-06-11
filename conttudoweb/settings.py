@@ -60,13 +60,14 @@ ADMIN_INDEX_TITLE = "Controles Administrativos"
 PUBLIC_SCHEMA_NAME = 'public'
 
 TENANT_MODEL = "tenants.Client"
+TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 COMMON_APPS = [
     # https://github.com/fabiocaccamo/django-admin-interface
     "admin_interface",
     "colorfield",
 
-    "tenant_schemas",
+    "django_tenants",
     "conttudoweb.tenants"
 ]
 
@@ -154,7 +155,8 @@ TEMPLATES = [
                 'conttudoweb.core.context_processors.consts',
             ],
             'loaders': [
-                'conttudoweb.tenants.template_loaders.CustomFilesystemLoader',
+                # 'conttudoweb.tenants.template_loaders.CustomFilesystemLoader',
+                'django_tenants.template.loaders.filesystem.Loader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader'
             ]
@@ -174,9 +176,9 @@ default_dburl = 'postgres://postgres:postgres@127.0.0.1:5432/db_conttudoweb'
 DATABASES = {
     'default': config('DATABASE_URL', default=default_dburl, cast=dburl),
 }
-DATABASES['default']['ENGINE'] = 'tenant_schemas.postgresql_backend'
+DATABASES['default']['ENGINE'] = 'django_tenants.postgresql_backend'
 DATABASE_ROUTERS = (
-    'tenant_schemas.routers.TenantSyncRouter',
+    'django_tenants.routers.TenantSyncRouter',
 )
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=1000, cast=int)

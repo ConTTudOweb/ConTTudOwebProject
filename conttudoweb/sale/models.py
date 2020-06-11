@@ -5,6 +5,17 @@ from conttudoweb.core.models import People
 from conttudoweb.inventory.models import Product
 
 
+class Vendor(models.Model):
+    name = models.CharField('nome', max_length=60)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'vendedor'
+        verbose_name_plural = 'vendedores'
+
+
 class SaleOrder(models.Model):
     customer = models.ForeignKey('core.People', verbose_name=People.customer_label, on_delete=models.PROTECT,
                                  limit_choices_to={'customer': True}, null=True, blank=True)

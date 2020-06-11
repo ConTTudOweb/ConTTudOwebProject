@@ -1,8 +1,6 @@
-from django.test import TestCase
-from tenant_schemas.test.cases import FastTenantTestCase
+from django_tenants.test.cases import FastTenantTestCase
 
 from ..models import MyUser
-
 
 _email = 'user@user.com'
 
