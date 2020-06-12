@@ -113,3 +113,10 @@ class ProductBySupplier(models.Model):
         verbose_name = 'referência por fornecedor'
         verbose_name_plural = 'referências por fornecedor'
         unique_together = ['product', 'supplier']
+
+
+class Warehouse(models.Model):
+    name = models.CharField('nome', max_length=60, unique=True)
+
+    def __str__(self):
+        return self.name

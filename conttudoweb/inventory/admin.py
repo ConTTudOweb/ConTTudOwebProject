@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from conttudoweb.inventory.models import Product, ProductBySupplier, Category, Subcategory, UnitOfMeasure, \
-    ProductSizeRegister, ProductSize
+    ProductSizeRegister, ProductSize, Warehouse
 
 
 class SubcategoryInline(admin.TabularInline):
@@ -58,3 +58,9 @@ class ProductModelAdmin(admin.ModelAdmin):
     search_fields = ['code', 'description', 'ncm', 'productbysupplier__description']
     inlines = [ProductBySupplierInline]
     autocomplete_fields = ['subcategory']
+
+
+@admin.register(Warehouse)
+class WarehouseModelAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
