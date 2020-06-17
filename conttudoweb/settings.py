@@ -164,7 +164,7 @@ TEMPLATES = [
     },
 ]
 
-MULTITENANT_TEMPLATE_DIRS = ['templates_tenants/%s']
+MULTITENANT_TEMPLATE_DIRS = ['tenants/%s/templates']
 
 WSGI_APPLICATION = 'conttudoweb.wsgi.application'
 
