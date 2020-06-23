@@ -2,8 +2,7 @@ from decimal import Decimal
 
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin import SimpleListFilter, widgets
-from django.core.exceptions import ValidationError
+from django.contrib.admin import SimpleListFilter
 from django.db.models import Q, Sum, Window, F, Case, When, DecimalField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -40,9 +39,13 @@ class AccountReceivableModelForm(AccountModelForm):
 
 
 class AccountModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'due_date', 'amount', 'category', 'person', 'expected_deposit_account', 'liquidated')
-    list_editable = ('liquidated',)
-    search_fields = ('description',)
+    list_display = ('title', 'due_date', 'category', 'person', 'expected_deposit_account', 'amount', 'liquidated_date',
+                    'liquidated')
+    list_editable = ('expected_deposit_account', 'amount', 'liquidated_date', 'liquidated')
+    search_fields = ('description', 'document')
+    list_filter = (('category', admin.RelatedOnlyFieldListFilter), 'expected_deposit_account',
+                   ('person', admin.RelatedOnlyFieldListFilter))
+    date_hierarchy = 'due_date'
     autocomplete_fields = ('category', 'person')
     fieldsets = (
         (None, {
@@ -82,6 +85,12 @@ class AccountModelAdmin(admin.ModelAdmin):
             return super().has_change_permission(request, obj) and (not obj.liquidated)
         else:
             return super().has_change_permission(request, obj)
+
+    class Media:
+        js = ('js/account-list-admin.js',)
+        css = {
+            'all': ('css/account-list-admin.css',)
+        }
 
 
 # @admin.register(Recurrence)

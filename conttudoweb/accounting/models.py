@@ -201,7 +201,7 @@ class Account(models.Model):
     observation = models.TextField('observação', null=True, blank=True)
     parent = models.IntegerField(null=True, blank=True, editable=False)
     liquidated = models.BooleanField('liquidado?', default=False)
-    liquidated_date = models.DateField('data da liquidação', null=True, blank=False)
+    liquidated_date = models.DateField('data da liquidação', null=True, blank=True)
     # reconciled = models.BooleanField('conciliado?', default=False)
 
     payment_receivement = models.CharField('pagamento/recebimento', max_length=1, choices=PAYMENT_RECEIVEMENT_CHOICES)
