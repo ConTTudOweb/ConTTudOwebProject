@@ -115,8 +115,11 @@ class ProductBySupplier(models.Model):
         unique_together = ['product', 'supplier']
 
 
-class Warehouse(models.Model):
+class Stock(models.Model):
     name = models.CharField('nome', max_length=60, unique=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'almoxarifado'

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from conttudoweb.inventory.models import Product, ProductBySupplier, Category, Subcategory, UnitOfMeasure, \
-    ProductSizeRegister, ProductSize, Warehouse
+    ProductSizeRegister, ProductSize, Stock
 
 
 class SubcategoryInline(admin.TabularInline):
@@ -60,7 +60,7 @@ class ProductModelAdmin(admin.ModelAdmin):
     autocomplete_fields = ['subcategory']
 
 
-@admin.register(Warehouse)
-class WarehouseModelAdmin(admin.ModelAdmin):
+@admin.register(Stock)
+class StockModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
