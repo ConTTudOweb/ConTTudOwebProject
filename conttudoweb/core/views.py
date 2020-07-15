@@ -1,6 +1,8 @@
+from django.db.models import ProtectedError
 from django_filters import rest_framework as filters
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.response import Response
 
 from . import models
 from . import serializers
@@ -8,6 +10,14 @@ from . import serializers
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        try:
+            self.perform_destroy(instance)
+        except ProtectedError as e:
+            return Response(status=status.HTTP_423_LOCKED, data={'detail': str(e)})
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FederativeUnitViewSet(CustomModelViewSet):

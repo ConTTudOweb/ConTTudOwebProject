@@ -20,10 +20,10 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import path, include
 from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
-from rest_framework.routers import APIRootView
 from rest_framework.schemas import get_schema_view
 
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
+from .inventory.views import UnitOfMeasureViewSet, CategoryViewSet, SubcategoryViewSet
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
@@ -44,9 +44,14 @@ class Router(routers.DefaultRouter):
 
 
 router = Router(trailing_slash=True)
+# core
 router.register('federative-unit', FederativeUnitViewSet)
 router.register('city', CityViewSet)
 router.register('people', PeopleViewSet)
+# inventory
+router.register('unit-of-measure', UnitOfMeasureViewSet)
+router.register('category', CategoryViewSet)
+router.register('subcategory', SubcategoryViewSet)
 
 urlpatterns = [path('', admin.site.urls),
 
