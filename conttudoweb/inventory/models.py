@@ -52,7 +52,7 @@ class ProductSizeRegister(models.Model):
 
 class ProductSize(models.Model):
     description = models.CharField('descrição', max_length=6)
-    product_size_register = models.ForeignKey('ProductSizeRegister', verbose_name=ProductSizeRegister._meta.verbose_name, on_delete=models.PROTECT)
+    product_size_register = models.ForeignKey('ProductSizeRegister', verbose_name=ProductSizeRegister._meta.verbose_name, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
@@ -60,6 +60,7 @@ class ProductSize(models.Model):
     class Meta:
         verbose_name = 'item de grade'
         verbose_name_plural = 'itens de grade'
+        unique_together = ('description', 'product_size_register')
 
 
 class Product(models.Model):
