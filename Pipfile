@@ -29,6 +29,7 @@ markdown = "*"
 django-tenants = "*"
 
 [dev-packages]
+coverage = "*"
 
 [requires]
 python_version = "3.8.0"

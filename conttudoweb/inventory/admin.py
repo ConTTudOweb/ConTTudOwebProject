@@ -11,12 +11,14 @@ class SubcategoryInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryModelAdmin(admin.ModelAdmin):
+    list_display = ('description',)
     inlines = [SubcategoryInline]
     search_fields = ['description']
 
 
 @admin.register(Subcategory)
 class SubcategoryModelAdmin(admin.ModelAdmin):
+    list_display = ('category', 'description')
     search_fields = ['description']
     autocomplete_fields = ['category']
     list_filter = ['category']
@@ -29,12 +31,14 @@ class ProductSizeInline(admin.TabularInline):
 
 @admin.register(ProductSizeRegister)
 class ProductSizeRegisterModelAdmin(admin.ModelAdmin):
+    list_display = ('description',)
     inlines = [ProductSizeInline]
     search_fields = ['description']
 
 
 @admin.register(ProductSize)
 class ProductSizeModelAdmin(admin.ModelAdmin):
+    list_display = ('product_size_register', 'description')
     search_fields = ['description']
     autocomplete_fields = ['product_size_register']
     list_filter = ['product_size_register']

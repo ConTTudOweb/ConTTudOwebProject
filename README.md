@@ -8,20 +8,21 @@
 ## How to develop?
 
 1. Clone the repository;
-2. Create a pipenv with Python 3.8.0;
-3. Activate pipenv;
-4. Install the dependencies;
+2. Create a pipenv with Python 3.8;
+3. Install the dependencies;
+4. Activate pipenv;
 5. Configure the instance with .env;
 6. Run the tests;
 
 ```console
 git clone https://github.com/ConTTudOweb/ConTTudOwebProject.git
 cd ConTTudOwebProject
-pipenv --three
-pipenv shellre
-pipenv install
+pipenv --python 3.8
+pipenv sync --dev
+pipenv shell
 cp contrib/env-sample .env
-python manage.py test
+coverage run --source='conttudoweb' manage.py test
+coverage report
 ```
 
 ```

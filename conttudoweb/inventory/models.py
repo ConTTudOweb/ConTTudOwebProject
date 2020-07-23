@@ -19,7 +19,7 @@ class UnitOfMeasure(models.Model):
 
 class Category(models.Model):
     code = models.CharField('código', max_length=20, null=True, blank=True)
-    description = models.CharField('descrição', max_length=120)
+    description = models.CharField('descrição', max_length=120, unique=True)
 
     def __str__(self):
         return self.description
@@ -65,7 +65,7 @@ class ProductSize(models.Model):
 
 class Product(models.Model):
     code = models.CharField('código', max_length=20, null=True, blank=True)
-    description = models.CharField('descrição', max_length=120)
+    description = models.CharField('descrição', max_length=120, unique=True)
     ncm = models.CharField('NCM', max_length=8, null=True, blank=True)
     subcategory = models.ForeignKey('Subcategory', verbose_name=Subcategory._meta.verbose_name,
                                     on_delete=models.PROTECT, null=True, blank=True)
