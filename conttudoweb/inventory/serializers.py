@@ -75,3 +75,59 @@ class ProductSizeRegisterSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ProductBySupplierSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = models.ProductBySupplier
+        exclude = ('product',)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    subcategory__str = serializers.CharField(source='subcategory', read_only=True)
+    unit_of_measure__str = serializers.CharField(source='unit_of_measure', read_only=True)
+    product_size_register__str = serializers.CharField(source='product_size_register', read_only=True)
+
+    productbysupplier_set = ProductBySupplierSerializer(many=True)
+
+    class Meta:
+        model = models.Product
+        fields = '__all__'
+
+    def create(self, validated_data):
+        productbysupplier_set = validated_data.pop('productbysupplier_set')
+        product = models.Product.objects.create(**validated_data)
+        for productbysupplier in productbysupplier_set:
+            models.ProductBySupplier.objects.create(product=product, **productbysupplier)
+        return product
+
+    # TODO: Melhorar este código!
+    def update(self, instance, validated_data):
+        product_by_supplier_data = validated_data.pop('productbysupplier_set')
+
+        for k, v in validated_data.items():
+            setattr(instance, k, v)
+
+        product_by_supplier_ids = [item.get('id') for item in product_by_supplier_data]
+        for product_by_supplier in instance.productbysupplier_set.all():
+            if product_by_supplier.id not in product_by_supplier_ids:
+                product_by_supplier.delete()
+
+        product_by_supplier_list = []
+        for product_by_supplier in product_by_supplier_data:
+            try:
+                _id = product_by_supplier.pop('id', 0)
+                product_by_supplier_instance = models.ProductBySupplier.objects.get(id=_id, product=instance)
+                for k, v in product_by_supplier.items():
+                    setattr(product_by_supplier_instance, k, v)
+                product_by_supplier_instance.save()
+            except models.ProductBySupplier.DoesNotExist:
+                product_by_supplier_instance = models.ProductBySupplier.objects.create(**product_by_supplier,
+                                                                                       product=instance)
+            product_by_supplier_list.append(product_by_supplier_instance)
+        instance.productbysupplier_set.set(product_by_supplier_list, clear=True)
+
+        instance.save()
+        return instance

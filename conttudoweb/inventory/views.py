@@ -30,10 +30,19 @@ class SubcategoryViewSet(CustomModelViewSet):
     search_fields = ['code', 'description', 'category__description']
 
 
-class ProductSizeRegisterSerializerViewSet(CustomModelViewSet):
+class ProductSizeRegisterViewSet(CustomModelViewSet):
     """
     ** Grade de Produtos **
     """
     serializer_class = serializers.ProductSizeRegisterSerializer
     queryset = models.ProductSizeRegister.objects.all()
     search_fields = ['description', ]
+
+
+class ProductViewSet(CustomModelViewSet):
+    """
+    ** Produto **
+    """
+    serializer_class = serializers.ProductSerializer
+    queryset = models.Product.objects.all()
+    search_fields = ['code', 'description', 'ncm']

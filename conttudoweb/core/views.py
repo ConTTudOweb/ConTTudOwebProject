@@ -54,3 +54,4 @@ class PeopleViewSet(CustomModelViewSet):
     serializer_class = serializers.PeopleSerializer
     queryset = models.People.objects.all()
     search_fields = ['name']
+    filterset_fields = ['customer', 'supplier']

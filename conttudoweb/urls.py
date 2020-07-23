@@ -24,7 +24,7 @@ from rest_framework.schemas import get_schema_view
 
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 from .inventory.views import UnitOfMeasureViewSet, CategoryViewSet, SubcategoryViewSet, \
-    ProductSizeRegisterSerializerViewSet
+    ProductSizeRegisterViewSet, ProductViewSet
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
@@ -53,7 +53,8 @@ router.register('people', PeopleViewSet)
 router.register('unit-of-measure', UnitOfMeasureViewSet)
 router.register('category', CategoryViewSet)
 router.register('subcategory', SubcategoryViewSet)
-router.register('product-size-register', ProductSizeRegisterSerializerViewSet)
+router.register('product-size-register', ProductSizeRegisterViewSet)
+router.register('product', ProductViewSet)
 
 urlpatterns = [path('', admin.site.urls),
 
