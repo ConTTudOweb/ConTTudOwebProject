@@ -17,6 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class SubcategorySerializer(serializers.ModelSerializer):
     category__description = serializers.CharField(source='category.description', read_only=True)
+    str = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = models.Subcategory
@@ -79,6 +80,7 @@ class ProductSizeRegisterSerializer(serializers.ModelSerializer):
 
 class ProductBySupplierSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
+    supplier__str = serializers.CharField(source='supplier', read_only=True)
 
     class Meta:
         model = models.ProductBySupplier
