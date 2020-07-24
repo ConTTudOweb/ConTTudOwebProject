@@ -82,15 +82,19 @@ class Product(models.Model):
     def __str__(self):
         return "%s (%s)" % (self.description, self.unit_of_measure)
 
+    # TODO: Remover esta função pois agora tem o preço de custo no produto
     def last_cost_price(self):
+        return self.cost_price_of_last_purchase()
+
+    last_cost_price.short_description = 'último preço de custo'
+
+    def cost_price_of_last_purchase(self):
         item = self.purchaseitems_set.order_by('-purchase_order__date').first()
         if item:
             # return locale.currency((item.amount / item.quantity), grouping=True)
             return format_currency((item.amount / item.quantity))
         else:
             return format_currency(self.cost_price)
-
-    last_cost_price.short_description = 'último preço de custo'
 
     class Meta:
         verbose_name = 'produto'

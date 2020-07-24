@@ -89,6 +89,7 @@ class ProductSerializer(serializers.ModelSerializer):
     subcategory__str = serializers.CharField(source='subcategory', read_only=True)
     unit_of_measure__str = serializers.CharField(source='unit_of_measure', read_only=True)
     product_size_register__str = serializers.CharField(source='product_size_register', read_only=True)
+    cost_price_of_last_purchase = serializers.ReadOnlyField()
 
     productbysupplier_set = ProductBySupplierSerializer(many=True)
 
