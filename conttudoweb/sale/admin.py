@@ -3,12 +3,12 @@ from django.contrib import admin
 
 from conttudoweb.accounting.admin import AccountReceivableModelForm
 from conttudoweb.accounting.models import AccountReceivable, Account
-from conttudoweb.sale.models import SaleOrder, SaleOrderItems, Vendor
+from conttudoweb.sale.models import SaleOrder, SaleOrderItems
 
 
-@admin.register(Vendor)
-class VendorModelAdmin(admin.ModelAdmin):
-    pass
+# @admin.register(Vendor)
+# class VendorModelAdmin(admin.ModelAdmin):
+#     pass
 
 
 class SaleOrderItemsInline(admin.TabularInline):
@@ -51,12 +51,12 @@ class AccountReceivableInline(admin.TabularInline):
 # TODO: Ao lançar o produto sugerir o preço de venda do mesmo.
 @admin.register(SaleOrder)
 class SaleOrderModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'code', 'date']
+    list_display = ['id', 'customer', 'date_order']
     list_display_links = ['id', 'customer']
     autocomplete_fields = ['customer']
     inlines = [SaleOrderItemsInline, AccountReceivableInline]
-    ordering = ['-date']
+    ordering = ['-date_order']
     readonly_fields = ('amount',)
     fieldsets = (
-        (None, {'fields': (('customer', 'date'), ('code', 'amount'))}),
+        (None, {'fields': (('customer', 'date_order'), 'amount')}),
     )

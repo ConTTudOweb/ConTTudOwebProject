@@ -17,4 +17,5 @@ def format_currency(value):
 federative_unit_verbose_name = 'unidade federativa'
 
 # sale
-sale_order_verbose_name = 'pedido de venda'
+sale_order_verbose_name = 'ordem de venda'
+sale_order_verbose_name_plural = 'ordens de venda'

@@ -95,6 +95,7 @@ class Product(models.Model):
             return format_currency((item.amount / item.quantity))
         else:
             return format_currency(self.cost_price)
+    cost_price_of_last_purchase.short_description = 'preço de custo da última compra'
 
     class Meta:
         verbose_name = 'produto'
@@ -118,6 +119,32 @@ class ProductBySupplier(models.Model):
         verbose_name = 'referência por fornecedor'
         verbose_name_plural = 'referências por fornecedor'
         unique_together = ['product', 'supplier']
+
+
+class PackagingType(models.Model):
+    description = models.CharField('descrição', max_length=60, unique=True)
+
+    def __str__(self):
+        return self.description
+
+    class Meta:
+        verbose_name = 'tipo de embalagem'
+        verbose_name_plural = 'tipos de embalagem'
+        ordering = ['description']
+
+
+class Packaging(models.Model):
+    product = models.ForeignKey('Product', verbose_name=Product._meta.verbose_name, on_delete=models.CASCADE)
+    packaging_type = models.ForeignKey('PackagingType', verbose_name=PackagingType._meta.verbose_name,
+                                       on_delete=models.PROTECT)
+    quantity = models.DecimalField('quantidade', max_digits=15, decimal_places=2)
+
+    def __str__(self):
+        return '{} ({:f})'.format(str(self.packaging_type), self.quantity)
+
+    class Meta:
+        verbose_name = 'embalagem'
+        verbose_name_plural = 'embalagens'
 
 
 class Stock(models.Model):

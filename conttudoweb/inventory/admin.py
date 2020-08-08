@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from conttudoweb.inventory.models import Product, ProductBySupplier, Category, Subcategory, UnitOfMeasure, \
-    ProductSizeRegister, ProductSize, Stock
+    ProductSizeRegister, ProductSize, Stock, Packaging, PackagingType
 
 
 class SubcategoryInline(admin.TabularInline):
@@ -50,18 +50,42 @@ class UnitOfMeasureModelAdmin(admin.ModelAdmin):
     ordering = ['initials']
 
 
+@admin.register(PackagingType)
+class PackagingTypeModelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'description']
+    list_editable = ['description']
+
+
 class ProductBySupplierInline(admin.TabularInline):
     model = ProductBySupplier
     extra = 0
     autocomplete_fields = ['supplier']
+    classes = ['collapse']
+
+
+class PackagingInline(admin.TabularInline):
+    model = Packaging
+    extra = 0
+    classes = ['collapse']
 
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'description', 'unit_of_measure', 'ncm', 'subcategory', 'last_cost_price']
+    list_display = ['id', 'description', 'unit_of_measure', 'ncm', 'subcategory', 'cost_price_of_last_purchase']
+    list_display_links = ['id', 'description']
     search_fields = ['code', 'description', 'ncm', 'productbysupplier__description']
-    inlines = [ProductBySupplierInline]
+    inlines = [ProductBySupplierInline, PackagingInline]
     autocomplete_fields = ['subcategory']
+    fieldsets = (
+        (None, {
+            'fields': (
+                'description',
+                ('unit_of_measure', 'code', 'ncm'),
+                ('subcategory', 'product_size_register'),
+                ('cost_price', 'sale_price', 'wholesale_selling_price'),
+            )
+        }),
+    )
 
 
 @admin.register(Stock)

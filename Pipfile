@@ -27,6 +27,7 @@ pyyaml = "*"
 coreapi = "*"
 markdown = "*"
 django-tenants = "*"
+drf-writable-nested = "*"
 
 [dev-packages]
 coverage = "*"
