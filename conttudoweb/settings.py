@@ -253,7 +253,7 @@ REST_FRAMEWORK = {
 
 REST_AUTH_SERIALIZERS = {
     'TOKEN_SERIALIZER': 'conttudoweb.authentication.serializers.TokenSerializer',
-    # 'USER_DETAILS_SERIALIZER': 'core.serializers.UserSerializer',
+    'USER_DETAILS_SERIALIZER': 'conttudoweb.authentication.serializers.UserDetailsSerializer',
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

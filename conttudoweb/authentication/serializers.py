@@ -4,21 +4,20 @@ from rest_framework import serializers
 from .models import MyUser
 
 
-class UserSerializer(serializers.ModelSerializer):
-    # user_permissions = serializers.SerializerMethodField()
-    #
-    # def get_user_permissions(self, user: MyUser):
-    #     if hasattr(user, 'user_permissions'):
-    #         return user.user_permissions.all().values_list('content_type__app_label', 'codename')
-    #     return []
+class UserDetailsSerializer(serializers.ModelSerializer):
+    user_permissions = serializers.SerializerMethodField('get_user_permissions')
+
+    def get_user_permissions(self, user: MyUser):
+        return user.get_all_permissions()
 
     class Meta:
         model = MyUser
-        exclude = ('password',)
+        fields = ['pk', 'first_name', 'last_name', 'email', 'date_of_birth', 'user_permissions']
+        read_only_fields = ['email', 'user_permissions']
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(many=False, read_only=True)
+    # user = UserDetailsSerializer(many=False, read_only=True)
 
     class Meta:
         model = TokenModel
