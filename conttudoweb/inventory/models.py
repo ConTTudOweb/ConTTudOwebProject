@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from conttudoweb.core.models import People
 from conttudoweb.core.utils import format_currency
 
@@ -17,15 +19,28 @@ class UnitOfMeasure(models.Model):
         verbose_name_plural = 'unidades de medida'
 
 
-class Category(models.Model):
+class Category(MPTTModel):
     code = models.CharField('código', max_length=20, null=True, blank=True)
     description = models.CharField('descrição', max_length=120, unique=True)
+    parent = TreeForeignKey('self', verbose_name='categoria', null=True, blank=True, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.description
+        _description = self.description
+        _parent = self.parent
+        while _parent:
+            _description = "{} / {}".format(_parent.description, _description)
+            _parent = _parent.parent
+        return _description
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        return super(Category, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:
         verbose_name = 'categoria'
+        unique_together = ('description', 'parent')
+
+    class MPTTMeta:
+        order_insertion_by = ['description']
 
 
 class Subcategory(models.Model):
@@ -67,6 +82,8 @@ class Product(models.Model):
     code = models.CharField('código', max_length=20, null=True, blank=True)
     description = models.CharField('descrição', max_length=120, unique=True)
     ncm = models.CharField('NCM', max_length=8, null=True, blank=True)
+    category = models.ForeignKey('Category', verbose_name=Category._meta.verbose_name,
+                                 on_delete=models.PROTECT, null=True, blank=True)
     subcategory = models.ForeignKey('Subcategory', verbose_name=Subcategory._meta.verbose_name,
                                     on_delete=models.PROTECT, null=True, blank=True)
     unit_of_measure = models.ForeignKey('UnitOfMeasure', verbose_name=UnitOfMeasure._meta.verbose_name,

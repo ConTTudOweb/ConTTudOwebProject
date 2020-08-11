@@ -10,9 +10,11 @@ class UnitOfMeasureSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    str = serializers.CharField(source='__str__', read_only=True)
+
     class Meta:
         model = models.Category
-        fields = '__all__'
+        fields = ('id', 'code', 'description', 'parent', 'str')
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
@@ -78,6 +80,12 @@ class ProductSizeRegisterSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PackagingTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PackagingType
+        fields = '__all__'
+
+
 class ProductBySupplierSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     supplier__str = serializers.CharField(source='supplier', read_only=True)
@@ -87,13 +95,23 @@ class ProductBySupplierSerializer(serializers.ModelSerializer):
         exclude = ('product',)
 
 
+class PackagingSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    packaging_type__str = serializers.CharField(source='packaging_type', read_only=True)
+
+    class Meta:
+        model = models.Packaging
+        exclude = ('product',)
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    subcategory__str = serializers.CharField(source='subcategory', read_only=True)
+    category__str = serializers.CharField(source='category', read_only=True)
     unit_of_measure__str = serializers.CharField(source='unit_of_measure', read_only=True)
     product_size_register__str = serializers.CharField(source='product_size_register', read_only=True)
     cost_price_of_last_purchase = serializers.ReadOnlyField()
 
     productbysupplier_set = ProductBySupplierSerializer(many=True)
+    packaging_set = PackagingSerializer(many=True)
 
     class Meta:
         model = models.Product
@@ -101,14 +119,21 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         productbysupplier_set = validated_data.pop('productbysupplier_set')
+        packaging_set = validated_data.pop('packaging_set')
+
         product = models.Product.objects.create(**validated_data)
+
         for productbysupplier in productbysupplier_set:
             models.ProductBySupplier.objects.create(product=product, **productbysupplier)
+        for packaging in packaging_set:
+            models.Packaging.objects.create(product=product, **packaging)
+
         return product
 
     # TODO: Melhorar este código!
     def update(self, instance, validated_data):
         product_by_supplier_data = validated_data.pop('productbysupplier_set')
+        packaging_data = validated_data.pop('packaging_set')
 
         for k, v in validated_data.items():
             setattr(instance, k, v)
@@ -131,6 +156,24 @@ class ProductSerializer(serializers.ModelSerializer):
                                                                                        product=instance)
             product_by_supplier_list.append(product_by_supplier_instance)
         instance.productbysupplier_set.set(product_by_supplier_list, clear=True)
+
+        packaging_ids = [item.get('id') for item in packaging_data]
+        for packaging in instance.packaging_set.all():
+            if packaging.id not in packaging_ids:
+                packaging.delete()
+
+        packaging_list = []
+        for packaging in packaging_data:
+            try:
+                _id = packaging.pop('id', 0)
+                packaging_instance = models.Packaging.objects.get(id=_id, product=instance)
+                for k, v in packaging.items():
+                    setattr(packaging_instance, k, v)
+                packaging_instance.save()
+            except models.Packaging.DoesNotExist:
+                packaging_instance = models.Packaging.objects.create(**packaging, product=instance)
+            packaging_list.append(packaging_instance)
+        instance.packaging_set.set(packaging_list, clear=True)
 
         instance.save()
         return instance

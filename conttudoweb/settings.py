@@ -74,6 +74,7 @@ COMMON_APPS = [
 SHARED_APPS = COMMON_APPS + [
     "django.contrib.contenttypes",
     "django.contrib.admin",
+    'mptt',
     "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.messages",

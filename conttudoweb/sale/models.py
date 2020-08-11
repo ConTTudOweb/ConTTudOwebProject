@@ -46,6 +46,7 @@ class SaleOrderItems(models.Model):
     quantity = models.DecimalField('quantidade', max_digits=15, decimal_places=2)
     price = models.DecimalField('preço', max_digits=15, decimal_places=2)
     discount_percentage = models.DecimalField('% desconto', max_digits=5, decimal_places=2, null=True, blank=True)
+    # packaging = models.ForeignKey('inventory.Packaging', )
 
     def _net_total(self):
         if self.quantity and self.price:

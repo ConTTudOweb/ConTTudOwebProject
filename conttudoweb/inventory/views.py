@@ -39,6 +39,15 @@ class ProductSizeRegisterViewSet(CustomModelViewSet):
     search_fields = ['description', ]
 
 
+class PackagingTypeViewSet(CustomModelViewSet):
+    """
+    ** Tipo de Embalagem **
+    """
+    serializer_class = serializers.PackagingTypeSerializer
+    queryset = models.PackagingType.objects.all()
+    search_fields = ['description', ]
+
+
 class ProductViewSet(CustomModelViewSet):
     """
     ** Produto **

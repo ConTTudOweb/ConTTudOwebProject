@@ -11,7 +11,7 @@ class SubcategoryInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryModelAdmin(admin.ModelAdmin):
-    list_display = ('description',)
+    list_display = ('__str__',)
     inlines = [SubcategoryInline]
     search_fields = ['description']
 

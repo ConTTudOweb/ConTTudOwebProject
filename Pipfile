@@ -28,6 +28,7 @@ coreapi = "*"
 markdown = "*"
 django-tenants = "*"
 drf-writable-nested = "*"
+django-mptt = "*"
 
 [dev-packages]
 coverage = "*"
