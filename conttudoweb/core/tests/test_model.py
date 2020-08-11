@@ -8,6 +8,7 @@ class ModelAdminTest:
     Model = None
     readonly_fields = ()
     exclude = None
+    str_list_display = False
 
     def setUp(self):
         if self.ModelAdmin is None:
@@ -21,6 +22,8 @@ class ModelAdminTest:
         self.assertNotEqual(self.model_admin.search_fields, ())
 
     def test_list_display(self):
+        if self.str_list_display:
+            return
         self.assertNotEqual(self.model_admin.list_display, ('__str__',))
 
     def test_readonly_fields(self):
