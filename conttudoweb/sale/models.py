@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
                                  limit_choices_to={'customer': True}, null=True, blank=True)
     date_order = models.DateField('data de emissão', default=timezone.now)
     validity_date = models.DateField('data de validade', null=True, blank=True)
-    items = models.ManyToManyField('inventory.Product', through='SaleOrderItems')
+    # items = models.ManyToManyField('inventory.Product', through='SaleOrderItems')
 
     def amount_admin(self):
         net_total = 0
