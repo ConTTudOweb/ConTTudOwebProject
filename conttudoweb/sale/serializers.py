@@ -7,6 +7,7 @@ from . import models
 class SaleOrderItemsSerializer(serializers.ModelSerializer):
     # id = serializers.IntegerField(read_only=True)
     product__str = serializers.CharField(source='product', read_only=True)
+    packaging_type = serializers.ReadOnlyField(source='packing.packaging_type.id')
 
     class Meta:
         model = models.SaleOrderItems

@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from conttudoweb.core import utils
 from conttudoweb.core.models import People
-from conttudoweb.inventory.models import Product
+from conttudoweb.inventory.models import Product, Packaging
 
 
 # class Vendor(models.Model):
@@ -27,7 +27,7 @@ class SaleOrder(models.Model):
     def amount_admin(self):
         net_total = 0
         for i in self.saleorderitems_set.all():
-            net_total += i._net_total()
+            net_total += i.net_total
         return utils.format_currency(net_total)
     amount_admin.short_description = 'valor líquido'
     amount = property(amount_admin)
@@ -46,9 +46,11 @@ class SaleOrderItems(models.Model):
     quantity = models.DecimalField('quantidade', max_digits=15, decimal_places=2)
     price = models.DecimalField('preço', max_digits=15, decimal_places=2)
     discount_percentage = models.DecimalField('% desconto', max_digits=5, decimal_places=2, null=True, blank=True)
-    # packaging = models.ForeignKey('inventory.Packaging', )
+    packing = models.ForeignKey('inventory.Packaging', verbose_name=Packaging._meta.verbose_name,
+                                on_delete=models.PROTECT, null=True, blank=True)
 
-    def _net_total(self):
+    @property
+    def net_total(self):
         if self.quantity and self.price:
             gross_total = self.quantity * self.price  # total bruto
             total_discount = 0
@@ -58,8 +60,8 @@ class SaleOrderItems(models.Model):
             return net_total
 
     def amount_admin(self):
-        if self._net_total():
-            return utils.format_currency(self._net_total())
+        if self.net_total:
+            return utils.format_currency(self.net_total)
         return ""
     amount_admin.short_description = 'valor líquido'
     amount = property(amount_admin)
