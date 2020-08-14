@@ -98,7 +98,7 @@ class ProductBySupplierSerializer(serializers.ModelSerializer):
 
 class PackagingSerializer(serializers.ModelSerializer):
     # id = serializers.IntegerField(read_only=True)
-    packaging_type__str = serializers.CharField(source='packaging_type', read_only=True)
+    packaging_type__str = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = models.Packaging

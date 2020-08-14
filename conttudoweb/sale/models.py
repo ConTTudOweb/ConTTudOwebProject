@@ -22,6 +22,7 @@ class SaleOrder(models.Model):
                                  limit_choices_to={'customer': True}, null=True, blank=True)
     date_order = models.DateField('data de emissão', default=timezone.now)
     validity_date = models.DateField('data de validade', null=True, blank=True)
+    discount_percentage = models.DecimalField('% desconto', max_digits=5, decimal_places=2, null=True, blank=True)
     # items = models.ManyToManyField('inventory.Product', through='SaleOrderItems')
 
     def amount_admin(self):
