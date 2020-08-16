@@ -25,7 +25,7 @@ from rest_framework.schemas import get_schema_view
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 from .inventory.views import UnitOfMeasureViewSet, CategoryViewSet, SubcategoryViewSet, \
     ProductSizeRegisterViewSet, ProductViewSet, PackagingTypeViewSet
-from .sale.views import SaleOrderViewSet
+from .sale.views import SaleOrderViewSet, SalesByProductViewSet
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_HEADER
@@ -59,6 +59,7 @@ router.register('packaging-type', PackagingTypeViewSet)
 router.register('product', ProductViewSet)
 # sale
 router.register('sale-order', SaleOrderViewSet)
+router.register('sales-by-product-list', SalesByProductViewSet, basename='sales-by-product-list')
 
 urlpatterns = [path('', admin.site.urls),
 
