@@ -28,6 +28,9 @@ coverage report
 ```
 python manage.py migrate_schemas --shared
 
+# rodar o shell_plus em um tenant específico
+manage tenant_command shell_plus --schema=demo
+
 python manage.py shell_plus
 Client.objects.create(name="sandrofolk", schema_name="sandrofolk", domain_url="sandrofolk.conttudoweb.local")
 

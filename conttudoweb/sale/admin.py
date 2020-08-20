@@ -6,11 +6,6 @@ from conttudoweb.accounting.models import AccountReceivable, Account
 from conttudoweb.sale.models import SaleOrder, SaleOrderItems
 
 
-# @admin.register(Vendor)
-# class VendorModelAdmin(admin.ModelAdmin):
-#     pass
-
-
 class SaleOrderItemsInline(admin.TabularInline):
     model = SaleOrderItems
     extra = 1
@@ -51,12 +46,12 @@ class AccountReceivableInline(admin.TabularInline):
 # TODO: Ao lançar o produto sugerir o preço de venda do mesmo.
 @admin.register(SaleOrder)
 class SaleOrderModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'date_order']
+    list_display = ['id', 'customer', 'date_order', 'net_total_admin']
     list_display_links = ['id', 'customer']
     autocomplete_fields = ['customer']
     inlines = [SaleOrderItemsInline, AccountReceivableInline]
     ordering = ['-date_order']
-    readonly_fields = ('amount',)
+    readonly_fields = ('net_total',)
     fieldsets = (
-        (None, {'fields': (('customer', 'date_order'), 'amount')}),
+        (None, {'fields': (('customer', 'date_order'), 'net_total')}),
     )

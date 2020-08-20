@@ -32,6 +32,8 @@ django-mptt = "*"
 
 [dev-packages]
 coverage = "*"
+ipython = {extras = ["notebook"], version = "*"}
+sqlparse = "*"
 
 [requires]
 python_version = "3.8.0"
