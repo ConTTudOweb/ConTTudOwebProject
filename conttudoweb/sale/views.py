@@ -2,8 +2,8 @@ import datetime
 import itertools
 import operator
 
-from django.db.models import Window, Sum, F
-from rest_framework import viewsets
+from django.db.models import Window, Sum, F, Q
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from . import models
@@ -21,22 +21,27 @@ class SaleOrderViewSet(CustomModelViewSet):
 
 
 class SalesByProductViewSet(viewsets.ViewSet):
-    # serializer_class = serializers.SalesByProductSerializer
+    """
+    list:\n
+    Retorna uma lista de todas as vendas agrupadas por produto.\n
+
+    params:\n
+        **start_date_order**: Data inicial
+        **end_date_order**: Data final
+    """
+
     queryset = models.SaleOrder.objects.none()
 
-    # def get_queryset(self):
-    #     return SaleOrder.objects.all()
-
     def list(self, request):
-        data = datetime.date.today()
-        # pedidos = models.SaleOrderItems.objects.filter(
-        #     sale_order__date_order__lte=data
-        # ).values(
-        #     'product__description', 'sale_order__date_order', 'quantity', 'packing__quantity'
-        # ).order_by('product__description')
-        pedidos = models.SaleOrderItems.objects.filter(
-            sale_order__date_order__lte=data
-        ).annotate(
+        start_date_order = request.query_params.get('start_date_order', None)
+        end_date_order = request.query_params.get('end_date_order', None)
+        _filter = Q()
+        if start_date_order:
+            _filter &= Q(sale_order__date_order__gte=start_date_order)
+        if end_date_order:
+            _filter &= Q(sale_order__date_order__lte=end_date_order)
+
+        pedidos = models.SaleOrderItems.objects.filter(_filter).annotate(
             quantity__sum=Window(
                 expression=Sum('quantity'),
                 partition_by=[F('product__description')],
@@ -51,8 +56,9 @@ class SalesByProductViewSet(viewsets.ViewSet):
             'product__description', 'quantity__sum', 'net_total__sum', 'sale_order__date_order', 'quantity',
             'net_total', 'packing__quantity'
         ).order_by('product__description')
-        # rows = itertools.groupby(pedidos, operator.itemgetter('product__description'))
-        rows = itertools.groupby(pedidos, operator.itemgetter('product__description', 'quantity__sum', 'net_total__sum'))
+        rows = itertools.groupby(
+            pedidos, operator.itemgetter('product__description', 'quantity__sum', 'net_total__sum')
+        )
 
         results = []
         for c_title, items in rows:
@@ -63,27 +69,10 @@ class SalesByProductViewSet(viewsets.ViewSet):
                 'details': list(items)
             })
 
-
-        #######################
-
-        # itens = models.SaleOrderItems.objects.filter(
-        #     sale_order__date_order__lte=data
-        # ).values(
-        #     'product__description', 'sale_order__date_order', 'quantity', 'packing__quantity'
-        # ).order_by('product__description', 'sale_order__date_order')
-        #
-        # results = []
-        # _produto = None
-        # for item in itens:
-        #     if _produto != item.get('product__description'):
-        #         _produto = item.get('product__description')
-        #         results.append({
-        #             'produto': _produto
-        #         })
-
-
-        return Response({
-            # 'data_inicial': request.query_params.get('data_inicial', None),
-            # 'queryset': pedidos,
+        data = {
+            'start_date_order': start_date_order,
+            'end_date_order': end_date_order,
             'results': results
-        })
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
