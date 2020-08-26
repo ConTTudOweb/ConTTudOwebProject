@@ -23,3 +23,4 @@ class CategoryModelTest(FastTenantTestCase):
 class CategoryAdminTest(ModelAdminTest, TestCase):
     ModelAdmin = CategoryModelAdmin
     Model = Category
+    str_list_display = True
