@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.db.models import ProtectedError
 from django_filters import rest_framework as filters
 from rest_framework import viewsets, status
@@ -10,6 +12,17 @@ from . import serializers
 
 class CustomModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter)
+
+    # def list(self, request, *args, **kwargs):
+    #     if request.query_params.get('page_size', 0) == '-1':
+    #         return Response(OrderedDict([
+    #             ('count', len(self.get_queryset())),
+    #             # ('next', self.get_next_link()),
+    #             # ('previous', self.get_previous_link()),
+    #             ('results', self.serializer_class(self.get_queryset(), many=True).data)
+    #         ]))
+    #
+    #     return super().list(request, args, kwargs)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

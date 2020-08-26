@@ -22,6 +22,7 @@ from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
+from .accounting import views as accounting_views
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 from .inventory.views import UnitOfMeasureViewSet, CategoryViewSet, SubcategoryViewSet, \
     ProductSizeRegisterViewSet, ProductViewSet, PackagingTypeViewSet
@@ -60,6 +61,14 @@ router.register('product', ProductViewSet)
 # sale
 router.register('sale-order', SaleOrderViewSet)
 router.register('sales-by-product-list', SalesByProductViewSet, basename='sales-by-product-list')
+# accounting
+router.register('accounting/account-payable', accounting_views.AccountPayableViewSet)
+router.register('accounting/category', accounting_views.CategoryViewSet, basename='accounting-category')
+router.register('accounting/bank', accounting_views.BankViewSet, basename='accounting-bank')
+router.register('accounting/deposit-account', accounting_views.DepositAccountViewSet,
+                basename='accounting-deposit-account')
+router.register('accounting/classification-center', accounting_views.ClassificationCenterViewSet,
+                basename='accounting-classification-center')
 
 urlpatterns = [path('', admin.site.urls),
 

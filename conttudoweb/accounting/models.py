@@ -9,6 +9,8 @@ from django.db.models import Sum
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.timezone import now
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from conttudoweb.accounting.managers import AccountReceivableManager, AccountPayableManager, FinancialMovementManager
 from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_in_future_for_recurrence, \
@@ -16,15 +18,24 @@ from conttudoweb.accounting.utils import get_due_date, AccountFrequencys, years_
 from conttudoweb.core import utils
 
 
-class Category(models.Model):
+class Category(MPTTModel):
     description = models.CharField('descrição', max_length=255)
+    parent = TreeForeignKey('self', verbose_name='categoria', null=True, blank=True, on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.description
+        _description = self.description
+        _parent = self.parent
+        while _parent:
+            _description = "{} / {}".format(_parent.description, _description)
+            _parent = _parent.parent
+        return _description
 
     class Meta:
         verbose_name = 'categoria'
-        ordering = ['description']
+        unique_together = ('description', 'parent')
+
+    class MPTTMeta:
+        order_insertion_by = ['description']
 
 
 class Bank(models.Model):
@@ -60,6 +71,20 @@ class DepositAccount(models.Model):
     account_digit = models.CharField('dígito da conta', max_length=2, null=True, blank=True)
 
     name = models.CharField('nome da conta', max_length=30)
+
+    @property
+    def agency_display(self):
+        _agency_digit = self.agency_digit or ''
+        if _agency_digit.strip() in [None, '']:
+            return self.agency_number
+        return "{}-{}".format(self.agency_number, self.agency_digit)
+
+    @property
+    def account_display(self):
+        _account_digit = self.account_digit or ''
+        if _account_digit.strip() in [None, '']:
+            return self.account_number
+        return "{}-{}".format(self.account_number, self.account_digit)
 
     def balance(self):
         balance = Decimal(0)
