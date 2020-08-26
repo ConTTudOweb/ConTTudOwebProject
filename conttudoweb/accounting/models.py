@@ -278,6 +278,7 @@ class Account(models.Model):
             self.parent = None
 
     def save(self, *args, **kwargs):
+        _new = (not self.pk)
         if self.sale_order:
             if self.description in [None, '']:
                 self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
@@ -285,7 +286,10 @@ class Account(models.Model):
             self.person = self.sale_order.customer
 
         if self.liquidated and not self.liquidated_date:
-            self.liquidated_date = timezone.now()
+            if not _new:
+                self.liquidated_date = timezone.now().date()
+            else:
+                self.liquidated_date = self.due_date
         elif not self.liquidated and self.liquidated_date:
             self.liquidated_date = None
 
@@ -303,6 +307,8 @@ class Account(models.Model):
                 new_instance.id = None
                 new_instance.parcel = x
                 new_instance.due_date = get_due_date(self.due_date, self.frequency, parcel=x)
+                if self.liquidated_date and _new and self.liquidated_date == self.due_date:
+                    new_instance.liquidated_date = new_instance.due_date
                 new_instance.save()
                 x += 1
 
