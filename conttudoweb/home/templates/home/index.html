@@ -2,102 +2,113 @@
 {% load static %}
 
 {% block content %}
-    <nav class="navbar navbar-default navbar-fixed">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand"><i class="pe-7s-home"></i> INÍCIO</a>
-            </div>
-
-            <div class="collapse navbar-collapse">
-                <!--<ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#">
-                           <i class="pe-7s-user"></i> Login
-                        </a>
-                    </li>
-                </ul>-->
-            </div>
-
+<nav class="navbar navbar-default navbar-fixed">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"><i class="pe-7s-home"></i> INÍCIO</a>
         </div>
-    </nav>
 
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
+        <div class="collapse navbar-collapse">
+            <!--<ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#">
+                       <i class="pe-7s-user"></i> Login
+                    </a>
+                </li>
+            </ul>-->
+        </div>
 
-                <div class="col-md-12">
+    </div>
+</nav>
 
-                    <div class="card card-plain">
-                        <div class="header">
-                            <h1 class="title">Con<span class="text-warning">TT</span>udO web</h1>
-                            <p class="category">Soluções em Tecnologia</p>
-                        </div>
-                    </div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
 
-                </div>
+            <div class="col-md-12">
 
-                <div class="col-md-12">
-                    <hr/>
-                    <div class="card">
-                        <div class="header navbar-ct-orange">
-                            <h2 class="title">Serviços</h2>
-                            <p class="">Conheça alguns dos serviços que prestamos!</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="card card-plain">
-                        <div class="content">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="image">
-                                        <img src="{% static 'assets/img/site.jpg' %}" alt="Criação de Sites Imagem"/>
-                                    </div>
-                                    <div class="content">
-                                        <h4 class="title">Criação de Sites<br/>
-                                            <small>Sites de qualidade, exclusivos e rápidos!</small>
-                                        </h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="image">
-                                        <img src="{% static 'assets/img/e-commerce.jpg' %}" alt="Criação de Lojas Online Imagem"/>
-                                    </div>
-                                    <div class="content">
-                                        <h4 class="title">Criação de Lojas Online<br/>
-                                            <small>Lojas seguras e confiáveis!</small>
-                                        </h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="image">
-                                        <img src="{% static 'assets/img/cartao.jpg' %}" alt="Cartões de Visita Imagem"/>
-                                    </div>
-                                    <div class="content">
-                                        <h4 class="title">Cartões de Visita<br/>
-                                            <small>Criamos toda a identidade visual de sua empresa!</small>
-                                        </h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="card card-plain">
+                    <div class="header">
+                        <h1 class="title">Con<span class="text-warning">TT</span>udO web</h1>
+                        <p class="category">Soluções em Tecnologia</p>
                     </div>
                 </div>
 
             </div>
+
+            <div class="col-md-12">
+                <hr/>
+                <h2 class="title">Serviços</h2>
+                <p class="">Conheça alguns dos serviços que prestamos!</p>
+
+<!--                <div class="card">-->
+<!--                    <div class="header navbar-ct-orange">-->
+<!--                        <h2 class="title">Serviços</h2>-->
+<!--                        <p class="">Conheça alguns dos serviços que prestamos!</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+            </div>
+
+            <div class="col-md-10 col-md-offset-1">
+                <ul class="text-warning">
+                    <li><h3>Sistemas Web;</h3></li>
+                    <li><h3>Sites;</h3></li>
+                    <li><h3>Portal do Cliente;</h3></li>
+                    <li><h3>Dashboards;</h3></li>
+                    <li><h3>Lojas Online.</h3></li>
+                </ul>
+<!--                <div class="card card-plain">-->
+<!--                    <div class="content">-->
+<!--                        <div class="col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="image">-->
+<!--                                    <img src="{% static 'assets/img/site.jpg' %}" alt="Criação de Sites Imagem"/>-->
+<!--                                </div>-->
+<!--                                <div class="content">-->
+<!--                                    <h4 class="title">Criação de Sites<br/>-->
+<!--                                        <small>Sites de qualidade, exclusivos e rápidos!</small>-->
+<!--                                    </h4>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="image">-->
+<!--                                    <img src="{% static 'assets/img/e-commerce.jpg' %}"-->
+<!--                                         alt="Criação de Lojas Online Imagem"/>-->
+<!--                                </div>-->
+<!--                                <div class="content">-->
+<!--                                    <h4 class="title">Criação de Lojas Online<br/>-->
+<!--                                        <small>Lojas seguras e confiáveis!</small>-->
+<!--                                    </h4>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="image">-->
+<!--                                    <img src="{% static 'assets/img/cartao.jpg' %}" alt="Cartões de Visita Imagem"/>-->
+<!--                                </div>-->
+<!--                                <div class="content">-->
+<!--                                    <h4 class="title">Cartões de Visita<br/>-->
+<!--                                        <small>Criamos toda a identidade visual de sua empresa!</small>-->
+<!--                                    </h4>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+
         </div>
     </div>
+</div>
 {% endblock content %}
