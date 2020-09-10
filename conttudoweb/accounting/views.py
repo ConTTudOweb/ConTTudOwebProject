@@ -1,3 +1,7 @@
+from django.db.models import Q
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+
 from . import models
 from . import serializers
 from ..core.views import CustomModelViewSet
@@ -48,3 +52,37 @@ class ClassificationCenterViewSet(CustomModelViewSet):
     queryset = models.ClassificationCenter.objects.all()
     search_fields = ['name']
     filterset_fields = ['cost_center', 'revenue_center']
+
+
+class AccountsPayableByDueDateViewSet(viewsets.ViewSet):
+    """
+    list:\n
+    Retorna uma lista de todas as contas a pagar filtradas por vencimento.\n
+
+    params:\n
+        **start_date**: Data inicial
+        **end_date**: Data final
+    """
+
+    queryset = models.AccountPayable.objects.none()
+
+    def list(self, request):
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+        _filter = Q()
+        if start_date:
+            _filter &= Q(due_date__gte=start_date)
+        if end_date:
+            _filter &= Q(due_date__lte=end_date)
+
+        contas = models.AccountPayable.objects.filter(_filter).values(
+            'due_date', 'description', 'amount'
+        ).order_by('due_date')
+
+        data = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'results': contas
+        }
+
+        return Response(data, status=status.HTTP_200_OK)

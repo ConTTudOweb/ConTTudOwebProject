@@ -23,6 +23,7 @@ from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
 from .accounting import views as accounting_views
+from .accounting.views import AccountsPayableByDueDateViewSet
 from .core.views import FederativeUnitViewSet, PeopleViewSet, CityViewSet
 from .inventory.views import UnitOfMeasureViewSet, CategoryViewSet, SubcategoryViewSet, \
     ProductSizeRegisterViewSet, ProductViewSet, PackagingTypeViewSet
@@ -69,6 +70,8 @@ router.register('accounting/deposit-account', accounting_views.DepositAccountVie
                 basename='accounting-deposit-account')
 router.register('accounting/classification-center', accounting_views.ClassificationCenterViewSet,
                 basename='accounting-classification-center')
+router.register('accounts-payable-by-due-date-list', AccountsPayableByDueDateViewSet,
+                basename='accounts-payable-by-due-date-list')
 
 urlpatterns = [path('', admin.site.urls),
 
