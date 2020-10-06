@@ -12,9 +12,9 @@ class AccountPayableViewSet(CustomModelViewSet):
     ** Contas a Pagar **
     """
     serializer_class = serializers.AccountPayableSerializer
-    queryset = models.AccountPayable.objects.all().order_by('due_date')
+    queryset = models.AccountPayable.objects.order_by('-id')
     search_fields = ['document', 'description', 'category__description', 'observation', 'person__name',
-                     'classification_center__description']
+                     'classification_center__name']
 
 
 class CategoryViewSet(CustomModelViewSet):

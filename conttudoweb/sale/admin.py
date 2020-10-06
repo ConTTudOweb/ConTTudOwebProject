@@ -46,7 +46,7 @@ class AccountReceivableInline(admin.TabularInline):
 # TODO: Ao lançar o produto sugerir o preço de venda do mesmo.
 @admin.register(SaleOrder)
 class SaleOrderModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'date_order', 'net_total_admin']
+    list_display = ['id', 'customer', 'date_order', 'discount_percentage', 'net_total_admin']
     list_display_links = ['id', 'customer']
     autocomplete_fields = ['customer']
     inlines = [SaleOrderItemsInline, AccountReceivableInline]

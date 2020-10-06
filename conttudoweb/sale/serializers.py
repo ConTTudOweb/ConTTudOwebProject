@@ -19,6 +19,7 @@ class SaleOrderSerializer(WritableNestedModelSerializer):
 
     saleorderitems_set = SaleOrderItemsSerializer(many=True)
 
+    gross_total = serializers.ReadOnlyField()
     net_total = serializers.ReadOnlyField()
 
     class Meta:

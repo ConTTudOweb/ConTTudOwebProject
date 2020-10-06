@@ -25,6 +25,14 @@ class SaleOrder(models.Model):
     discount_percentage = models.DecimalField('% desconto', max_digits=5, decimal_places=2, null=True, blank=True)
 
     @property
+    def gross_total(self):
+        gross_total = 0
+        for i in self.saleorderitems_set.all():
+            gross_total += i.gross_total or 0
+
+        return gross_total
+
+    @property
     def net_total(self):
         net_total = 0
         for i in self.saleorderitems_set.all():
@@ -55,11 +63,36 @@ class SaleOrderItems(models.Model):
     discount_percentage = models.DecimalField('% desconto', max_digits=5, decimal_places=2, null=True, blank=True)
     packing = models.ForeignKey('inventory.Packaging', verbose_name=Packaging._meta.verbose_name,
                                 on_delete=models.PROTECT, null=True, blank=True)
+    gross_total = models.DecimalField('valor bruto', max_digits=15, decimal_places=2, null=True, blank=True,
+                                      editable=False)
     net_total = models.DecimalField('valor líquido', max_digits=15, decimal_places=2, null=True, blank=True,
                                     editable=False)
 
-    @property
-    def _net_total(self):
+    class Meta:
+        verbose_name = 'item de venda'
+        verbose_name_plural = 'itens de venda'
+
+    # @property
+    # def _net_total(self):
+    #     if self.quantity and self.price:
+    #         gross_total = self.quantity * self.price  # total bruto
+    #         total_discount = 0
+    #         _discount_percentage = self.discount_percentage or self.sale_order.discount_percentage
+    #         if _discount_percentage:
+    #             total_discount = gross_total * (_discount_percentage / 100)  # total desconto
+    #         net_total = gross_total - total_discount  # total líquido
+    #         return net_total
+
+    def amount_admin(self):
+        # if self._net_total:
+        if self.net_total:
+            # return utils.format_currency(self._net_total)
+            return utils.format_currency(self.net_total)
+        return ""
+    amount_admin.short_description = 'valor líquido'
+    amount = property(amount_admin)
+
+    def save(self, *args, **kwargs):
         if self.quantity and self.price:
             gross_total = self.quantity * self.price  # total bruto
             total_discount = 0
@@ -67,15 +100,8 @@ class SaleOrderItems(models.Model):
             if _discount_percentage:
                 total_discount = gross_total * (_discount_percentage / 100)  # total desconto
             net_total = gross_total - total_discount  # total líquido
-            return net_total
 
-    def amount_admin(self):
-        if self._net_total:
-            return utils.format_currency(self._net_total)
-        return ""
-    amount_admin.short_description = 'valor líquido'
-    amount = property(amount_admin)
+            self.gross_total = gross_total
+            self.net_total = net_total
 
-    class Meta:
-        verbose_name = 'item de venda'
-        verbose_name_plural = 'itens de venda'
+        super().save(*args, **kwargs)

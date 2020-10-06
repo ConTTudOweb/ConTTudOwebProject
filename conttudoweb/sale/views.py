@@ -16,7 +16,7 @@ class SaleOrderViewSet(CustomModelViewSet):
     ** Ordem de Venda **
     """
     serializer_class = serializers.SaleOrderSerializer
-    queryset = models.SaleOrder.objects.all()
+    queryset = models.SaleOrder.objects.order_by('-id')
     search_fields = ['customer__name', 'id']
 
 
