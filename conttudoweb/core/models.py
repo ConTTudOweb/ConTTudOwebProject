@@ -86,4 +86,5 @@ class People(models.Model):
             })
 
     class Meta:
-        verbose_name = 'pessoa'
+        verbose_name = 'Cliente / Fornecedor'
+        verbose_name_plural = 'Clientes / Fornecedores'

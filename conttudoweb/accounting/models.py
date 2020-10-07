@@ -186,7 +186,7 @@ class Account(models.Model):
         (AccountTypes.parcelled.value, 'Parcelada'),
     ]
     TYPE_CHOICES = TYPE_CHOICES_INLINES + [
-        (AccountTypes.recurrent.value, 'Recorrente'),
+        (AccountTypes.recurrent.value, 'Recorrente (BETA)'),
     ]
 
     amount_label = 'valor'
