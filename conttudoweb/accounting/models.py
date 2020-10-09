@@ -345,6 +345,7 @@ class AccountPayable(Account):
 
     def __init__(self, *args, **kwargs):
         self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.payment.value
+        self._meta.get_field('financial_movement').default = False
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -362,6 +363,7 @@ class AccountReceivable(Account):
 
     def __init__(self, *args, **kwargs):
         self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.receivement.value
+        self._meta.get_field('financial_movement').default = False
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -389,9 +391,7 @@ class FinancialMovement(Account):
         verbose_name_plural = 'movimentos financeiros'
 
 
-
 class ExpectedCashFlow(Account):
-
     class Meta:
         proxy = True
         verbose_name_plural = 'Fluxo de caixa previsto'
