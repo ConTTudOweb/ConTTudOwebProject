@@ -13,6 +13,8 @@ from conttudoweb.accounting.utils import AccountPaymentReceivement
 from .models import AccountReceivable, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
     Account, FinancialMovement, ExpectedCashFlow
 
+from ..core.admin import DefaultListFilter
+
 
 # TODO: Criar um teste para verificar se o código do JS está funcionando.
 class AccountModelForm(forms.ModelForm):
@@ -38,22 +40,52 @@ class AccountReceivableModelForm(AccountModelForm):
         }
 
 
+class ExpectedDepositAccountFilter(SimpleListFilter):
+    title = DepositAccount._meta.verbose_name
+    parameter_name = 'expected_deposit_account'
+
+    def lookups(self, _, model_admin):
+        return [(deposit_account.id, str(deposit_account)) for deposit_account in DepositAccount.objects.all()]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(expected_deposit_account__id__exact=self.value())
+        else:
+            messages.add_message(request, messages.WARNING, 'Escolha uma ' + self.title)
+            return queryset.filter(expected_deposit_account__id__exact=0)
+
+
+class LiquidatedFilter(DefaultListFilter):
+    title = 'liquidado?'
+    parameter_name = 'liquidated__exact'
+
+    def lookups(self, request, model_admin):
+        return (
+            (True, 'Sim'),
+            (False, 'Não'),
+        )
+
+    def default_value(self):
+        return False
+
+
 class AccountModelAdmin(admin.ModelAdmin):
     list_display = ('title', 'due_date', 'category', 'person', 'expected_deposit_account', 'amount', 'liquidated_date',
                     'liquidated')
     list_editable = ('expected_deposit_account', 'amount', 'liquidated_date', 'liquidated')
     search_fields = ('description', 'document')
-    list_filter = (('category', admin.RelatedOnlyFieldListFilter), 'expected_deposit_account',
+    list_filter = (LiquidatedFilter, ('category', admin.RelatedOnlyFieldListFilter), 'expected_deposit_account',
                    ('person', admin.RelatedOnlyFieldListFilter))
     date_hierarchy = 'due_date'
     autocomplete_fields = ('category', 'person')
     fieldsets = (
         (None, {
             'fields': (
-                ('type', 'frequency', 'number_of_parcels'),
-                ('description', 'due_date', 'amount'),
-                ('category', 'document_emission_date', 'expected_deposit_account'),
-                ('person', 'classification_center', 'document'),
+                'type', ('frequency', 'number_of_parcels'),
+                'description', ('due_date', 'amount'),
+                ('document_emission_date', 'expected_deposit_account'),
+                ('person', 'document'),
+                ('category', 'classification_center'),
                 'observation'
             )
         }),
@@ -167,6 +199,7 @@ class FinancialMovementModelAdmin(admin.ModelAdmin):
         return format_html(
             '<span class="{}">{}</span>', _css_class, obj.amount_with_sign
         )
+
     amount_with_sign.admin_order_field = 'amount_with_sign'
     amount_with_sign.short_description = Account.amount_label
     amount_with_sign.allow_tags = True
@@ -254,13 +287,14 @@ class DepositAccountModelAdmin(admin.ModelAdmin):
     )
     form = DepositAccountModelForm
 
-    def balance(self, obj):
-        return obj.balance()
+    # def balance(self, obj):
+    #     return obj.balance()
 
 
 class CustomForm(forms.Form):
     expected_deposit_account = forms.ModelMultipleChoiceField(queryset=DepositAccount.objects.all(), required=False,
-                                                              label='Conta financeira', widget=forms.CheckboxSelectMultiple)
+                                                              label='Conta financeira',
+                                                              widget=forms.CheckboxSelectMultiple)
     start_date = forms.DateField(widget=forms.SelectDateWidget, required=False, label='Vencimento inicial')
     end_date = forms.DateField(widget=forms.SelectDateWidget, required=False, label='Vencimento final')
 
@@ -292,7 +326,8 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
             form = CustomForm(request.POST)
             if form.is_valid():
                 _filter = Q(liquidated=False)
-                _filter &= (Q(expected_deposit_account__in=form.cleaned_data['expected_deposit_account']) | Q(expected_deposit_account__isnull=True))
+                _filter &= (Q(expected_deposit_account__in=form.cleaned_data['expected_deposit_account']) | Q(
+                    expected_deposit_account__isnull=True))
                 if form.cleaned_data['start_date'] is not None:
                     _filter &= Q(due_date__gte=form.cleaned_data['start_date'])
                 if form.cleaned_data['end_date'] is not None:
@@ -306,7 +341,8 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
                     cumulative_amount=Window(
                         Sum(
                             Case(
-                                When(payment_receivement=AccountPaymentReceivement.payment.value, then=(F('amount')*-1)),
+                                When(payment_receivement=AccountPaymentReceivement.payment.value,
+                                     then=(F('amount') * -1)),
                                 default=F('amount'),
                                 output_field=DecimalField()
                             )
@@ -315,7 +351,7 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
                             F('due_date').asc(),
                             F('id').asc()
                         )
-                    )+opening_balance,
+                    ) + opening_balance,
                 ).order_by('due_date', 'id')
                 context['queryset'] = transactions
                 context['form'] = form

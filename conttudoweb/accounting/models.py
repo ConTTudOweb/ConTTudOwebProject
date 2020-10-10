@@ -95,6 +95,7 @@ class DepositAccount(models.Model):
             balance = qs['balance']
 
         return balance
+    balance.short_description = 'saldo'
 
     def __str__(self):
         return str(self.name)
@@ -346,11 +347,13 @@ class AccountPayable(Account):
     def __init__(self, *args, **kwargs):
         self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.payment.value
         self._meta.get_field('financial_movement').default = False
+        self._meta.get_field('liquidated').default = False
         super().__init__(*args, **kwargs)
 
     class Meta:
         proxy = True
-        verbose_name = 'pagamento'
+        verbose_name = 'conta (à pagar/paga)'
+        verbose_name_plural = 'contas (à pagar/pagas)'
 
 
 @receiver(models.signals.post_delete, sender=AccountPayable)
@@ -364,11 +367,13 @@ class AccountReceivable(Account):
     def __init__(self, *args, **kwargs):
         self._meta.get_field('payment_receivement').default = AccountPaymentReceivement.receivement.value
         self._meta.get_field('financial_movement').default = False
+        self._meta.get_field('liquidated').default = False
         super().__init__(*args, **kwargs)
 
     class Meta:
         proxy = True
-        verbose_name = 'recebimento'
+        verbose_name = 'conta (à receber/recebida)'
+        verbose_name_plural = 'contas (à receber/recebidas)'
 
 
 @receiver(models.signals.post_delete, sender=AccountReceivable)

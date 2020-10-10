@@ -1,10 +1,15 @@
 {% extends 'admin/change_form.html' %}
 
-{% block submit_buttons_bottom %}
-    {% if original.pk %}
-    <div class="submit-row" style="background-color: transparent; border: transparent;">
-        <input type="submit" value="{% block text_liquidated %}{% endblock %}" name="_process">
+{% block object-tools-items %}
+    <div class="card card-secondary card-outline">
+        <div class="card-body">
+        {% if original.pk %}
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary form-control" value="{% block text_liquidated %}{% endblock %}" name="_process">
+        </div>
+        {% endif %}
+        </div>
     </div>
-    {% endif %}
+
     {{ block.super }}
 {% endblock %}

@@ -1,7 +1,41 @@
 from django.contrib import admin
+from django.utils.encoding import force_text
 
 from conttudoweb.core.forms import PeopleForm
 from .models import People, City, FederativeUnit
+
+
+class DefaultListFilter(admin.SimpleListFilter):
+    all_value = '_all'
+
+    def default_value(self):
+        raise NotImplementedError()
+
+    def queryset(self, request, queryset):
+        if self.parameter_name in request.GET and request.GET[self.parameter_name] == self.all_value:
+            return queryset
+
+        if self.parameter_name in request.GET:
+            return queryset.filter(**{self.parameter_name: request.GET[self.parameter_name]})
+
+        return queryset.filter(**{self.parameter_name: self.default_value()})
+
+    def choices(self, cl):
+        yield {
+            'selected': self.value() == self.all_value,
+            'query_string': cl.get_query_string({self.parameter_name: self.all_value}, []),
+            'display': 'Todos(as)',
+        }
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == force_text(lookup) or (
+                        self.value() is None and force_text(self.default_value()) == force_text(lookup)
+                ),
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
 
 
 @admin.register(FederativeUnit)
@@ -29,15 +63,20 @@ class PeopleModelAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-            ('customer', 'supplier', 'person_type'), 'name', ('federation_subscription_number', 'state_subscription_number'), ('phone', 'email'))
+                'customer', 'supplier',
+                'name',
+                'person_type',
+                ('federation_subscription_number', 'state_subscription_number'), ('phone', 'email'),
+                'observation'
+            )
         }),
         ('Endereço', {
             'classes': ('collapse',),
             'fields': ('zip_code', ('address', 'address_number'), ('complement', 'neighborhood'), 'city'),
         }),
-        (None, {
-            'fields': ('observation',)
-        }),
+        # (None, {
+        #     'fields': ('observation',)
+        # }),
     )
     form = PeopleForm
 

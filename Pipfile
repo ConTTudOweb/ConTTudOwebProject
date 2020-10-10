@@ -29,6 +29,7 @@ markdown = "*"
 django-tenants = "*"
 drf-writable-nested = "*"
 django-mptt = "*"
+django-jazzmin = "*"
 
 [dev-packages]
 coverage = "*"

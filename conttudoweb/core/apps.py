@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class CoreConfig(AppConfig):
     name = 'conttudoweb.core'
-    verbose_name = 'cadastros básicos'
+    verbose_name = 'Cadastros Básicos'

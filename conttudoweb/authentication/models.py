@@ -1,8 +1,20 @@
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser,
-    PermissionsMixin)
+    PermissionsMixin, Permission as authPermission, Group as authGroup)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+
+class Group(authGroup):
+    class Meta:
+        proxy = True
+
+
+class Permission(authPermission):
+    class Meta:
+        proxy = True
+        verbose_name = 'permissão'
+        verbose_name_plural = 'permissões'
 
 
 # https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
@@ -57,6 +69,13 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def username(self):
         return self.email
 
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
     def get_short_name(self):
         """Return the short name for the user."""
         return self.first_name
@@ -67,8 +86,15 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.email
+        return self.get_full_name() or self.email
 
     class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+
+
+class User(MyUser):
+    class Meta:
+        proxy = True
         verbose_name = _('user')
         verbose_name_plural = _('users')

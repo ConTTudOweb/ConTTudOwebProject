@@ -1,14 +1,14 @@
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
 from django.contrib import admin
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Group as authGroup
 from django.contrib.contenttypes.models import ContentType
 
 from .forms import MyUserChangeForm, MyUserCreationForm
-from .models import MyUser
+from .models import User, Permission, Group
 
 
 # TODO: Precisa criar um esquema que crie o usuário com senha aleatória e solicite a troca no primeiro acesso.
-@admin.register(MyUser)
+@admin.register(User)
 class MyUserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = MyUserChangeForm
@@ -40,6 +40,9 @@ class MyUserAdmin(BaseUserAdmin):
     search_fields = ('email',)
     ordering = ('email',)
 
+
+admin.site.unregister(authGroup)
+admin.site.register(Group, GroupAdmin)
 
 admin.site.register(ContentType)
 admin.site.register(Permission)
