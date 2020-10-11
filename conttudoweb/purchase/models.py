@@ -11,6 +11,14 @@ class PurchaseOrder(models.Model):
     date = models.DateField('data', null=True, blank=False)
     items = models.ManyToManyField('inventory.Product', through='PurchaseItems')
 
+    @property
+    def amount_total(self):
+        amount_total = 0
+        for i in self.purchaseitems_set.all():
+            amount_total += (i.amount * i.quantity) or 0
+
+        return amount_total
+
     def __str__(self):
         return "#%s - %s" % (self.id, self.supplier)
 
@@ -29,3 +37,6 @@ class PurchaseItems(models.Model):
     class Meta:
         verbose_name = 'item de compra'
         verbose_name_plural = 'itens de compra'
+
+    def __str__(self):
+        return f'ID {self.id}'

@@ -40,13 +40,6 @@ class SaleOrder(models.Model):
 
         return net_total
 
-    def net_total_admin(self):
-        net_total = 0
-        for i in self.saleorderitems_set.all():
-            net_total += i.net_total
-        return utils.format_currency(net_total)
-    net_total_admin.short_description = 'valor líquido'
-
     def __str__(self):
         return '#{:06}'.format(self.id)
 
@@ -71,6 +64,9 @@ class SaleOrderItems(models.Model):
     class Meta:
         verbose_name = 'item de venda'
         verbose_name_plural = 'itens de venda'
+
+    def __str__(self):
+        return f'ID {self.id}'
 
     # @property
     # def _net_total(self):

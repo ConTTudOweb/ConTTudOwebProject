@@ -283,7 +283,7 @@ class Account(models.Model):
         if self.sale_order:
             if self.description in [None, '']:
                 self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
-            self.document_emission_date = self.sale_order.date
+            self.document_emission_date = self.sale_order.date_order
             self.person = self.sale_order.customer
 
         if self.liquidated and not self.liquidated_date:

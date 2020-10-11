@@ -342,16 +342,28 @@ JAZZMIN_SETTINGS = {
     'navigation_expanded': True,
 
     # Hide these apps when generating side menu e.g (auth)
-    'hide_apps': [],
+    'hide_apps': ['contenttypes', 'authtoken'],
 
     # Hide these models when generating side menu (e.g auth.user)
-    'hide_models': [],
+    'hide_models': [
+        'authentication.permission',
+
+        'core.city', 'core.federativeunit',
+
+        'accounting.bank', 'accounting.category', 'accounting.classificationcenter', 'accounting.depositaccount',
+
+        'inventory.stock', 'inventory.category', 'inventory.productsizeregister', 'inventory.productsize',
+        'inventory.subcategory', 'inventory.packagingtype', 'inventory.unitofmeasure'
+    ],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    # "order_with_respect_to": ["core", "core.federativeunit", "sale"],
+    "order_with_respect_to": ["authentication", "authentication.user",
+                              'core', 'purchase',
+                              'accounting', 'accounting.accountpayable', 'accounting.accountreceivable', 'accounting.financialmovement'],
 
     # Custom links to append to app groups, keyed on app name
     'custom_links': {
+        'core': [{'model': 'accounting.depositaccount'}]
         # 'polls': [{
         #     'name': 'Make Messages',
         #     'url': 'make_messages',
@@ -366,7 +378,29 @@ JAZZMIN_SETTINGS = {
         # 'authentication': 'fas fa-users-cog',
         'authentication.user': 'fas fa-user',
         'authentication.Group': 'fas fa-users',
-        'authentication.Permission': 'fas fa-user-check',
+        # 'authentication.Permission': 'fas fa-user-check',
+
+        # 'core.city': 'fas fa-city',
+        'core.people': 'fas fa-user-friends',
+        # 'core.federativeunit': 'fas fa-globe-americas',
+
+        'purchase.purchaseorder': 'fas fa-cart-plus',
+
+        # 'accounting.bank': 'fas fa-coins',
+        # 'accounting.category': 'fas fa-tags',
+        # 'accounting.classificationcenter': 'fas fa-chart-pie',
+        'accounting.accountpayable': 'fas fa-dollar-sign',
+        'accounting.accountreceivable': 'fas fa-hand-holding-usd',
+        'accounting.depositaccount': 'fas fa-wallet',
+        'accounting.expectedcashflow': 'fas fa-chart-line',
+        'accounting.financialmovement': 'fas fa-money-bill-wave',
+
+        # 'inventory.stock': 'fas fa-warehouse',
+        # 'inventory.category': 'fas fa-tag',
+        # 'inventory.productsizeregister': 'fas fa-text-width',
+        'inventory.product': 'fas fa-box',
+
+        'sale.saleorder': 'fas fa-store',
     },
     # Icons that are used when one is not manually specified
     'default_icon_parents': 'fas fa-chevron-circle-right',
@@ -392,7 +426,7 @@ JAZZMIN_SETTINGS = {
     # - carousel
     "changeform_format": "horizontal_tabs",
     # override change forms on a per modeladmin basis
-    # "changeform_format_overrides": {"authentication.user": "collapsible", "auth.group": "vertical_tabs",},
+    # "changeform_format_overrides": {"sale.saleorder": "collapsible"},
     # Add a language dropdown into the admin
     "language_chooser": False,
 }

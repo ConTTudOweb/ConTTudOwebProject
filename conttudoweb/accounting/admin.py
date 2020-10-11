@@ -307,6 +307,8 @@ class CustomForm(forms.Form):
 
 @admin.register(ExpectedCashFlow)
 class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
+    change_list_template = 'change_form_expected_cash_flow.html'
+
     def has_add_permission(*args, **kwargs):
         return False
 
@@ -317,11 +319,19 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
         return False
 
     def changelist_view(self, request, extra_context=None):
-        context = {
-            'title': self.model._meta.verbose_name_plural,
-            'opts': ExpectedCashFlow._meta,
-            'empty_value_display': self.admin_site.empty_value_display
-        }
+        if extra_context is None:
+            extra_context = {}
+        extra_context['form'] = CustomForm()
+        extra_context['empty_value_display'] = self.admin_site.empty_value_display
+
+        result = super(ExpectedCashFlowModelAdmin, self).changelist_view(request, extra_context)
+        context = result.context_data
+        # context = {
+        #     **self.admin_site.each_context(request),
+        #     'title': self.model._meta.verbose_name_plural,
+        #     'opts': ExpectedCashFlow._meta,
+        #     'empty_value_display': self.admin_site.empty_value_display
+        # }
         if request.method == 'POST':
             form = CustomForm(request.POST)
             if form.is_valid():
@@ -353,15 +363,14 @@ class ExpectedCashFlowModelAdmin(admin.ModelAdmin):
                         )
                     ) + opening_balance,
                 ).order_by('due_date', 'id')
+
                 context['queryset'] = transactions
                 context['form'] = form
                 context['opening_balance'] = opening_balance
                 return render(request, 'rel_expected_cash_flow.html', context)
-        else:
-            form = CustomForm()
+        # else:
+        #     form = CustomForm()
 
-        context['form'] = form
-        # context['add'] = False
-        # context['change'] = False
-        # context['is_popup'] = False
-        return render(request, 'change_form_expected_cash_flow.html', context)
+        return result
+        # context['form'] = form
+        # return render(request, 'change_form_expected_cash_flow.html', context)

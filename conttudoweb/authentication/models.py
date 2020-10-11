@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 class Group(authGroup):
     class Meta:
         proxy = True
+        verbose_name = 'perfil de acesso'
+        verbose_name_plural = 'perfis de acesso'
 
 
 class Permission(authPermission):
