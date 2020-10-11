@@ -71,18 +71,20 @@ class PackagingInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'description', 'unit_of_measure', 'ncm', 'subcategory', 'cost_price_of_last_purchase']
+    list_display = ['id', 'description', 'unit_of_measure', 'ncm', 'category', 'cost_price_of_last_purchase']
     list_display_links = ['id', 'description']
     search_fields = ['code', 'description', 'ncm', 'productbysupplier__description']
     inlines = [ProductBySupplierInline, PackagingInline]
-    autocomplete_fields = ['subcategory']
+    autocomplete_fields = ['category']
     fieldsets = (
-        (None, {
+        ('Geral', {
             'fields': (
                 'description',
-                ('unit_of_measure', 'code', 'ncm'),
-                ('subcategory', 'product_size_register'),
-                ('cost_price', 'sale_price', 'wholesale_selling_price'),
+                ('unit_of_measure', 'product_size_register'),
+                ('code', 'ncm'),
+                'category',
+                'cost_price',
+                ('sale_price', 'wholesale_selling_price'),
             )
         }),
     )

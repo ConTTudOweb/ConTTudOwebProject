@@ -79,7 +79,7 @@ class AccountModelAdmin(admin.ModelAdmin):
     date_hierarchy = 'due_date'
     autocomplete_fields = ('category', 'person')
     fieldsets = (
-        (None, {
+        ('Geral', {
             'fields': (
                 'type', ('frequency', 'number_of_parcels'),
                 'description', ('due_date', 'amount'),
@@ -177,7 +177,7 @@ class FinancialMovementModelAdmin(admin.ModelAdmin):
     autocomplete_fields = ('category',)
     raw_id_fields = ('person',)  # TODO: autocomplete_fields não está funcionando com limit_choices_to
     fieldsets = (
-        (None, {
+        ('Geral', {
             'fields': (
                 'payment_receivement',
                 ('description', 'liquidated_date', 'amount'),
@@ -277,7 +277,7 @@ class DepositAccountModelAdmin(admin.ModelAdmin):
     autocomplete_fields = ('bank',)
     radio_fields = {"type": admin.HORIZONTAL}
     fieldsets = (
-        (None, {
+        ('Geral', {
             'fields': ('type',
                        'bank',
                        ('agency_number', 'agency_digit'),

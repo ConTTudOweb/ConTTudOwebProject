@@ -18,7 +18,7 @@ class PurchaseOrderModelAdmin(admin.ModelAdmin):
     inlines = [PurchaseItemsInline]
     ordering = ['-date']
     fieldsets = (
-        (None, {'fields': ('supplier', ('date', 'code'), 'amount_total_admin')}),
+        ('Geral', {'fields': ('supplier', ('date', 'code'), 'amount_total_admin')}),
     )
     readonly_fields = ('amount_total_admin',)
 

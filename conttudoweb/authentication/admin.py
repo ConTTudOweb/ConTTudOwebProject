@@ -21,7 +21,7 @@ class MyUserAdmin(BaseUserAdmin):
     list_display = ('email', 'date_of_birth', 'is_active', 'is_staff', 'is_superuser')
     list_filter = ('is_active', 'is_staff', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        ('Geral', {'fields': ('email', 'password')}),
         ('Dados pessoais', {'fields': ('date_of_birth', 'first_name', 'last_name')}),
         ('Permissões', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         # ('Preferências', {'fields': ('entity',)}),
@@ -30,7 +30,7 @@ class MyUserAdmin(BaseUserAdmin):
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = (
         (
-            None,
+            'Geral',
             {
                 'classes': ('wide',),
                 'fields': ('email', 'password1', 'password2')

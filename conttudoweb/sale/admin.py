@@ -58,7 +58,7 @@ class SaleOrderModelAdmin(admin.ModelAdmin):
     ordering = ['-date_order']
     readonly_fields = ('net_total_admin',)
     fieldsets = (
-        (None, {'fields': (('customer', 'date_order'), ('validity_date', 'discount_percentage'), 'net_total_admin')}),
+        ('Geral', {'fields': (('customer', 'date_order'), ('validity_date', 'discount_percentage'), 'net_total_admin')}),
     )
 
     def net_total_admin(self, obj):

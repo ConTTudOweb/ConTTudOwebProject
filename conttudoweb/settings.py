@@ -353,17 +353,23 @@ JAZZMIN_SETTINGS = {
         'accounting.bank', 'accounting.category', 'accounting.classificationcenter', 'accounting.depositaccount',
 
         'inventory.stock', 'inventory.category', 'inventory.productsizeregister', 'inventory.productsize',
-        'inventory.subcategory', 'inventory.packagingtype', 'inventory.unitofmeasure'
+        'inventory.subcategory', 'inventory.packagingtype', 'inventory.unitofmeasure', 'inventory.product'
     ],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["authentication", "authentication.user",
-                              'core', 'purchase',
-                              'accounting', 'accounting.accountpayable', 'accounting.accountreceivable', 'accounting.financialmovement'],
+    "order_with_respect_to": [
+        "authentication", "authentication.user",
+        'core',
+        'accounting', 'accounting.accountpayable', 'accounting.accountreceivable', 'accounting.financialmovement',
+        'purchase'
+    ],
 
     # Custom links to append to app groups, keyed on app name
     'custom_links': {
-        'core': [{'model': 'accounting.depositaccount'}]
+        'core': [
+            {'model': 'accounting.depositaccount'},
+            {'model': 'inventory.product'},
+        ]
         # 'polls': [{
         #     'name': 'Make Messages',
         #     'url': 'make_messages',
