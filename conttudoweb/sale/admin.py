@@ -1,8 +1,7 @@
-from django import forms
 from django.contrib import admin
 
-from conttudoweb.accounting.admin import AccountReceivableModelForm
-from conttudoweb.accounting.models import AccountReceivable, Account
+from conttudoweb.accounting.forms import AccountReceivableSaleOrderModelForm
+from conttudoweb.accounting.models import AccountReceivable
 from conttudoweb.core import utils
 from conttudoweb.sale.models import SaleOrder, SaleOrderItems
 
@@ -14,20 +13,20 @@ class SaleOrderItemsInline(admin.TabularInline):
     readonly_fields = ('amount',)
 
 
-class AccountReceivableSaleOrderModelForm(AccountReceivableModelForm):
-    type = forms.ChoiceField(choices=AccountReceivable.TYPE_CHOICES_INLINES)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk:
-            self.fields['type'].disabled = True
-            if self.instance.type != Account.AccountTypes.normal.value:
-                self.fields['frequency'].disabled = True
-                self.fields['number_of_parcels'].disabled = True
-
-    class Meta(AccountReceivableModelForm.Meta):
-        fields = ('type', 'frequency', 'number_of_parcels', 'due_date', 'amount', 'expected_deposit_account',
-                  'document')
+# class AccountReceivableSaleOrderModelForm(AccountReceivableModelForm):
+#     type = forms.ChoiceField(choices=AccountReceivable.TYPE_CHOICES_INLINES)
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         if self.instance.pk:
+#             self.fields['type'].disabled = True
+#             if self.instance.type != Account.AccountTypes.normal.value:
+#                 self.fields['frequency'].disabled = True
+#                 self.fields['number_of_parcels'].disabled = True
+#
+#     class Meta(AccountReceivableModelForm.Meta):
+#         fields = ('type', 'frequency', 'number_of_parcels', 'due_date', 'amount', 'expected_deposit_account',
+#                   'document')
 
 
 class AccountReceivableInline(admin.TabularInline):

@@ -10,34 +10,10 @@ from django.urls import resolve
 from django.utils.html import format_html
 
 from conttudoweb.accounting.utils import AccountPaymentReceivement
+from .forms import AccountPayableModelForm, AccountReceivableModelForm, AccountModelForm
 from .models import AccountReceivable, AccountPayable, Bank, Category, ClassificationCenter, DepositAccount, \
     Account, FinancialMovement, ExpectedCashFlow
-
 from ..core.admin import DefaultListFilter
-
-
-# TODO: Criar um teste para verificar se o código do JS está funcionando.
-class AccountModelForm(forms.ModelForm):
-    class Media:
-        js = ('js/account-type-field-admin.js',)
-
-
-class AccountPayableModelForm(AccountModelForm):
-    class Meta:
-        labels = {
-            'expected_deposit_account': 'Pagar por',
-            'person': 'Fornecedor',
-            'classification_center': 'Centro de custo'
-        }
-
-
-class AccountReceivableModelForm(AccountModelForm):
-    class Meta:
-        labels = {
-            'expected_deposit_account': 'Receber por',
-            'person': 'Cliente',
-            'classification_center': 'Centro de receita'
-        }
 
 
 class ExpectedDepositAccountFilter(SimpleListFilter):

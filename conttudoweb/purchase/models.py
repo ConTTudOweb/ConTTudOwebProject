@@ -1,5 +1,6 @@
 from django.db import models
 
+from conttudoweb.core import utils
 from conttudoweb.core.models import People
 from conttudoweb.inventory.models import Product
 
@@ -23,8 +24,8 @@ class PurchaseOrder(models.Model):
         return "#%s - %s" % (self.id, self.supplier)
 
     class Meta:
-        verbose_name = 'ordem de compra'
-        verbose_name_plural = 'ordens de compra'
+        verbose_name = utils.purchase_order_verbose_name
+        verbose_name_plural = utils.purchase_order_verbose_name_plural
 
 
 class PurchaseItems(models.Model):

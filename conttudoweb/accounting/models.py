@@ -1,8 +1,8 @@
 import enum
 from copy import deepcopy
+from decimal import Decimal
 
 from dateutil.relativedelta import relativedelta
-from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
@@ -238,6 +238,8 @@ class Account(models.Model):
     financial_movement = models.BooleanField(default=False)
     sale_order = models.ForeignKey('sale.SaleOrder', on_delete=models.CASCADE, null=True, blank=True,
                                    verbose_name=utils.sale_order_verbose_name)
+    purchase_order = models.ForeignKey('purchase.PurchaseOrder', on_delete=models.CASCADE, null=True, blank=True,
+                                       verbose_name=utils.purchase_order_verbose_name)
 
     __original_description = None
 
@@ -285,6 +287,12 @@ class Account(models.Model):
                 self.description = "{!s} #{!s}".format(self.sale_order._meta.verbose_name.capitalize(), self.sale_order.id)
             self.document_emission_date = self.sale_order.date_order
             self.person = self.sale_order.customer
+
+        if self.purchase_order:
+            if self.description in [None, '']:
+                self.description = "{!s} #{!s}".format(self.purchase_order._meta.verbose_name.capitalize(), self.purchase_order.id)
+            self.document_emission_date = self.purchase_order.date
+            self.person = self.purchase_order.supplier
 
         if self.liquidated and not self.liquidated_date:
             if not _new:

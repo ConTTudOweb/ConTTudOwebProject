@@ -19,3 +19,7 @@ federative_unit_verbose_name = 'unidade federativa'
 # sale
 sale_order_verbose_name = 'ordem de venda'
 sale_order_verbose_name_plural = 'ordens de venda'
+
+# purchase
+purchase_order_verbose_name = 'ordem de compra'
+purchase_order_verbose_name_plural = 'ordens de compra'
