@@ -46,7 +46,7 @@ class LiquidatedFilter(DefaultListFilter):
 
 
 class AccountModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'due_date', 'category', 'person', 'expected_deposit_account', 'amount', 'liquidated_date',
+    list_display = ('title', 'due_date', 'person', 'expected_deposit_account', 'amount', 'liquidated_date',
                     'liquidated')
     list_editable = ('expected_deposit_account', 'amount', 'liquidated_date', 'liquidated')
     search_fields = ('description', 'document')

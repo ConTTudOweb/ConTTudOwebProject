@@ -15,6 +15,7 @@ import os
 from corsheaders.defaults import default_headers
 from decouple import config, Csv
 from dj_database_url import parse as dburl
+from django.conf.locale.pt_BR import formats as pt_BR_formats
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from conttudoweb.core.context_processors import EMPRESA_NAME, EMPRESA_SLOGAN
@@ -222,6 +223,9 @@ USE_TZ = True
 USE_THOUSAND_SEPARATOR = True
 THOUSAND_SEPARATOR = '.'
 DECIMAL_SEPARATOR = ','
+
+pt_BR_formats.DATETIME_FORMAT = pt_BR_formats.SHORT_DATETIME_FORMAT
+pt_BR_formats.DATE_FORMAT = pt_BR_formats.SHORT_DATE_FORMAT
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

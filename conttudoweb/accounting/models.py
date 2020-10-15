@@ -195,7 +195,7 @@ class Account(models.Model):
     document = models.CharField('documento', max_length=60, null=True, blank=True)
     description = models.CharField('descrição', max_length=255)
     amount = models.DecimalField(amount_label, max_digits=15, decimal_places=2)
-    due_date = models.DateField('data de vencimento', null=True, blank=False)
+    due_date = models.DateField('vencimento', null=True, blank=False)
     recurrence_key = models.ForeignKey('Recurrence', on_delete=models.PROTECT, null=True, blank=True, editable=False)
     recurrence_count = models.IntegerField(null=True, blank=True, editable=False)
     type = models.CharField('tipo', max_length=3, default=AccountTypes.normal.value,
