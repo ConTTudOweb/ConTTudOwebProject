@@ -388,6 +388,7 @@ JAZZMIN_SETTINGS = {
         # 'authentication': 'fas fa-users-cog',
         'authentication.user': 'fas fa-user',
         'authentication.Group': 'fas fa-users',
+        'authentication.LogEntry': 'fas fa-history',
         # 'authentication.Permission': 'fas fa-user-check',
 
         # 'core.city': 'fas fa-city',

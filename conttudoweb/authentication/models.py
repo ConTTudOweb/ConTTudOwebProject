@@ -1,6 +1,7 @@
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser,
     PermissionsMixin, Permission as authPermission, Group as authGroup)
+from django.contrib.admin.models import LogEntry as adminLogEntry
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -17,6 +18,13 @@ class Permission(authPermission):
         proxy = True
         verbose_name = 'permissão'
         verbose_name_plural = 'permissões'
+
+
+class LogEntry(adminLogEntry):
+    class Meta:
+        proxy = True
+        verbose_name = 'histórico de ações'
+        verbose_name_plural = 'históricos de ações'
 
 
 # https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html

@@ -37,8 +37,8 @@ class LiquidatedFilter(DefaultListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            (True, 'Sim'),
-            (False, 'Não'),
+            (True, 'Liquidado'),
+            (False, 'Não Liquidado'),
         )
 
     def default_value(self):

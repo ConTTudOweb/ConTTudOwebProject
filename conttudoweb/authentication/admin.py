@@ -1,10 +1,10 @@
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
 from django.contrib.auth.models import Group as authGroup
 from django.contrib.contenttypes.models import ContentType
 
 from .forms import MyUserChangeForm, MyUserCreationForm
-from .models import User, Permission, Group
+from .models import User, Permission, Group, LogEntry
 
 
 # TODO: Precisa criar um esquema que crie o usuário com senha aleatória e solicite a troca no primeiro acesso.
@@ -39,6 +39,42 @@ class MyUserAdmin(BaseUserAdmin):
     )
     search_fields = ('email',)
     ordering = ('email',)
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    date_hierarchy = 'action_time'
+
+    list_filter = [
+        'user',
+        'content_type',
+        'action_flag'
+    ]
+
+    search_fields = [
+        'object_repr',
+        'change_message'
+    ]
+
+    list_display = [
+        'action_time',
+        'user',
+        'content_type',
+        'object_repr',
+        'action_flag',
+    ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 admin.site.unregister(authGroup)
