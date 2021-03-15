@@ -55,7 +55,7 @@ class SalesByProductViewSet(viewsets.ViewSet):
         ).values(
             'product__description', 'quantity__sum', 'net_total__sum', 'sale_order__date_order', 'quantity',
             'net_total', 'packing__quantity'
-        ).order_by('product__description')
+        ).order_by('product__description', 'sale_order__date_order')
         rows = itertools.groupby(
             pedidos, operator.itemgetter('product__description', 'quantity__sum', 'net_total__sum')
         )
